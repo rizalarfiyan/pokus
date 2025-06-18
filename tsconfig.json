@@ -30,6 +30,7 @@
   },
   "include": [
     "src",
+    "eslint.config.ts",
     "vite.config.base.ts",
     "vite.config.chrome.ts",
     "vite.config.firefox.ts"
