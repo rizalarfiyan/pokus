@@ -16,7 +16,6 @@ export const baseManifest = {
   ...manifest,
   version: pkg.version,
   ...(isDev ? devManifest : ({} as ManifestV3Export)),
-  default_locale: 'en',
 } as ManifestV3Export
 
 export const baseBuildOptions: BuildOptions = {
