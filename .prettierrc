@@ -1,10 +1,10 @@
 {
-  "trailingComma": "all",
-  "semi": false,
-  "singleQuote": true,
-  "arrowParens": "avoid",
-  "printWidth": 120,
-  "bracketSameLine": true,
-  "htmlWhitespaceSensitivity": "strict",
-  "plugins": ["prettier-plugin-tailwindcss"]
+    "trailingComma": "all",
+    "semi": false,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "printWidth": 120,
+    "bracketSameLine": true,
+    "htmlWhitespaceSensitivity": "strict",
+    "plugins": ["prettier-plugin-tailwindcss"]
 }

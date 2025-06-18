@@ -1,7 +1,7 @@
 pre-commit:
-  parallel: true
-  jobs:
-    - name: linter
-      run: "bun run eslint:check"
-    - name: format
-      run: "bun run prettier:check"
+    parallel: true
+    jobs:
+        - name: linter
+          run: 'bun run eslint:check'
+        - name: format
+          run: 'bun run prettier:check'
