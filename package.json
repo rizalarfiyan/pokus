@@ -14,7 +14,8 @@
     "eslint": "eslint --max-warnings=0 . --fix",
     "eslint:check": "eslint1 --max-warnings=0 .",
     "prettier": "prettier --write",
-    "prettier:check": "prettier --check"
+    "prettier:check": "prettier --check",
+    "postinstall": "lefthook install"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-tailwindcss": "^3.18.0",
     "globals": "^16.2.0",
+    "lefthook": "^1.11.14",
     "nodemon": "^3.1.10",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
