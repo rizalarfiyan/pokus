@@ -1,22 +1,17 @@
 {
-  "action": {
-    "default_icon": "dev-icon-32.png"
-  },
-  "icons": {
-    "128": "dev-icon-128.png",
-    "48": "dev-icon-48.png",
-    "32": "dev-icon-32.png",
-    "16": "dev-icon-16.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "dev-icon-128.png",
-        "dev-icon-48.png",
-        "dev-icon-32.png",
-        "dev-icon-16.png"
-      ],
-      "matches": []
-    }
-  ]
+    "action": {
+        "default_icon": "dev-icon-32.png"
+    },
+    "icons": {
+        "128": "dev-icon-128.png",
+        "48": "dev-icon-48.png",
+        "32": "dev-icon-32.png",
+        "16": "dev-icon-16.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["dev-icon-128.png", "dev-icon-48.png", "dev-icon-32.png", "dev-icon-16.png"],
+            "matches": []
+        }
+    ]
 }
