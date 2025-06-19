@@ -1,3 +1,4 @@
+import Blocking from './blocking'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GlobeLock, ListMusic, Target, Trophy } from 'lucide-react'
 import { useState } from 'react'
@@ -12,7 +13,7 @@ const tabsContents = [
   {
     value: 'blocking',
     label: 'Blocking',
-    content: 'Page Blocking!',
+    content: <Blocking />,
     icon: <GlobeLock className="size-5" />,
   },
   {
@@ -60,13 +61,11 @@ const TabList = ({ before, after }: TabListProps) => {
         </TabsList>
         {after}
       </div>
-      <div className="container mx-auto flex-1 border border-red-500">
-        {tabsContents.map(tab => (
-          <TabsContent key={tab.value} value={tab.value}>
-            {tab.content}
-          </TabsContent>
-        ))}
-      </div>
+      {tabsContents.map(tab => (
+        <TabsContent key={tab.value} value={tab.value} className="container mx-auto flex flex-1 flex-col">
+          {tab.content}
+        </TabsContent>
+      ))}
     </Tabs>
   )
 }

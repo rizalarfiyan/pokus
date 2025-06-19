@@ -1,0 +1,373 @@
+import { DndContext, DragOverlay, useSensors, useSensor, PointerSensor } from '@dnd-kit/core'
+import { SortableContext, arrayMove, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { PlusIcon, TrashIcon } from 'lucide-react'
+import { nanoid } from 'nanoid'
+import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
+import type { DragStartEvent, DragEndEvent, DragOverEvent } from '@dnd-kit/core'
+
+type Id = string | number
+
+type Column = {
+  id: Id
+  title: string
+}
+
+type Task = {
+  id: Id
+  columnId: Id
+  content: string
+}
+
+interface ColumnContainerProps {
+  column: Column
+  tasks: Task[]
+  deleteColumn: (id: Id) => void
+  updateColumn: (id: Id, title: string) => void
+  createTask: (columnId: Id) => void
+  deleteTask: (id: Id) => void
+  updateTask: (id: Id, content: string) => void
+}
+
+const ColumnContainer = (props: ColumnContainerProps) => {
+  const [editMode, setEditMode] = useState(false)
+  const { column, deleteColumn, updateColumn, createTask, tasks, deleteTask, updateTask } = props
+  const tasksIds = useMemo(() => tasks.map(task => task.id), [tasks])
+
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+    id: column.id,
+    data: { type: 'Column', column },
+    disabled: editMode,
+  })
+
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  }
+
+  if (isDragging) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex h-[500px] max-h-[500px] w-[350px] flex-col rounded-md border-2 border-yellow-300 bg-black"></div>
+    )
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex h-[500px] max-h-[500px] w-[350px] flex-col rounded-md">
+      {/* Column Title*/}
+      <div
+        aria-hidden="true"
+        {...attributes}
+        {...listeners}
+        onClick={() => {
+          setEditMode(true)
+        }}
+        className="bg-mainBackgroundColor text-md flex h-[60px] cursor-grab items-center justify-between rounded-b-none border-4 p-3 font-bold">
+        <div className="flex gap-2">
+          <div className="flex items-center justify-center rounded-full px-2.5 py-1 text-sm">1</div>
+          {!editMode && column.title}
+          {editMode && (
+            <input
+              className="rounded border bg-black px-2 outline-none focus:border-rose-500"
+              value={column.title}
+              onChange={e => updateColumn(column.id, e.target.value)}
+              onBlur={() => {
+                setEditMode(false)
+              }}
+              onKeyDown={e => {
+                if (e.key !== 'Enter') return
+                setEditMode(false)
+              }}
+            />
+          )}
+        </div>
+        <button
+          onClick={() => {
+            deleteColumn(column.id)
+          }}
+          className="hover:bg-columnBackgroundColor rounded stroke-gray-500 px-2 py-2 hover:stroke-white">
+          <TrashIcon />
+        </button>
+      </div>
+
+      {/* Column Task Container*/}
+      <div className="flex flex-grow flex-col gap-4 overflow-x-hidden overflow-y-auto p-2">
+        <SortableContext items={tasksIds}>
+          {tasks.map(task => (
+            <TaskCard key={task.id} task={task} deleteTask={deleteTask} updateTask={updateTask} />
+          ))}
+        </SortableContext>
+      </div>
+
+      {/* Column Footer*/}
+      <button
+        onClick={() => {
+          createTask(column.id)
+        }}
+        className="border-columnBackgroundColor border2 border-x-columnBackgroundColor hover:bg-mainBackgroundColor flex items-center gap-2 rounded-md p-2 hover:text-rose-500 active:bg-black">
+        <PlusIcon />
+        Add Task
+      </button>
+    </div>
+  )
+}
+
+interface TaskCardProps {
+  task: Task
+  deleteTask: (id: Id) => void
+  updateTask: (id: Id, content: string) => void
+}
+
+const TaskCard = ({ task, deleteTask, updateTask }: TaskCardProps) => {
+  const [mouseIsOver, setMouseIsOver] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+    id: task.id,
+    data: { type: 'Task', task },
+    disabled: editMode,
+  })
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  }
+
+  const toggleEditMode = () => {
+    setEditMode(prev => !prev)
+  }
+
+  if (isDragging) {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="bg-mainBackgroundColor flex-left relative flex h-[100px] min-h-[100px] cursor-grab items-center rounded-xl border-2 border-rose-500 p-2.5 opacity-30"
+      />
+    )
+  }
+
+  if (editMode) {
+    return (
+      <div
+        {...attributes}
+        {...listeners}
+        ref={setNodeRef}
+        style={style}
+        className="bg-mainBackgroundColor flex-left task relative flex h-[100px] min-h-[100px] cursor-grab items-center rounded-xl p-2.5 hover:ring-2 hover:ring-rose-500 hover:ring-inset">
+        <textarea
+          className="h-[90%] w-full resize-none rounded border-none bg-transparent text-white focus:outline-none"
+          value={task.content}
+          autoFocus
+          placeholder="Task content here"
+          onBlur={toggleEditMode}
+          onKeyDown={e => {
+            if (e.shiftKey && e.key == 'Enter') toggleEditMode()
+          }}
+          onChange={e => updateTask(task.id, e.target.value)}></textarea>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      aria-hidden="true"
+      onClick={toggleEditMode}
+      onMouseEnter={() => {
+        setMouseIsOver(true)
+      }}
+      onMouseLeave={() => {
+        setMouseIsOver(false)
+      }}
+      {...attributes}
+      {...listeners}
+      ref={setNodeRef}
+      style={style}
+      className="bg-mainBackgroundColor flex-left relative flex h-[100px] min-h-[100px] cursor-grab items-center rounded-xl p-2.5 hover:ring-2 hover:ring-rose-500 hover:ring-inset">
+      <p className="my-auto h-[90%] w-full overflow-x-hidden overflow-y-auto whitespace-pre-wrap"> {task.content}</p>
+      {mouseIsOver && (
+        <button
+          onClick={() => {
+            deleteTask(task.id)
+          }}
+          className="bg-columnBackgroundColor absolute top-1/2 right-4 -translate-y-1/2 rounded stroke-white p-2">
+          <TrashIcon />
+        </button>
+      )}
+    </div>
+  )
+}
+
+const KanbanBoard = () => {
+  const [columns, setColumns] = useState<Column[]>([])
+  const [activeColumn, setActiveColumn] = useState<Column | null>(null)
+  const [activeTask, setActiveTask] = useState<Task | null>(null)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const columnsId = useMemo(() => columns.map(col => col.id), [columns])
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 3 },
+    }),
+  )
+
+  const createNewColumn = () => {
+    const columnToAdd: Column = {
+      id: nanoid(),
+      title: `Column ${columns.length + 1}`,
+    }
+    setColumns([...columns, columnToAdd])
+  }
+
+  const deleteColumn = (id: Id) => {
+    const filteredColumns = columns.filter(col => col.id !== id)
+    setColumns(filteredColumns)
+
+    const newTasks = tasks.filter(t => t.columnId !== id)
+    setTasks(newTasks)
+  }
+
+  const updateColumn = (id: Id, title: string) => {
+    const newColumns = columns.map(col => {
+      if (col.id !== id) return col
+      return { ...col, title }
+    })
+    setColumns(newColumns)
+  }
+
+  const createTask = (columnId: Id) => {
+    const newTask: Task = {
+      id: nanoid(),
+      columnId,
+      content: `Task ${tasks.length + 1}`,
+    }
+    setTasks([...tasks, newTask])
+  }
+
+  const deleteTask = (id: Id) => {
+    const newTasks = tasks.filter(task => task.id !== id)
+    setTasks(newTasks)
+  }
+
+  const updateTask = (id: Id, content: string) => {
+    const newTasks = tasks.map(task => {
+      if (task.id !== id) return task
+      return { ...task, content }
+    })
+    setTasks(newTasks)
+  }
+
+  const onDragStart = (event: DragStartEvent) => {
+    console.log('Drag Start', event)
+    if (event.active.data.current?.type === 'Column') {
+      setActiveColumn(event.active.data.current.column)
+      return
+    }
+    if (event.active.data.current?.type === 'Task') {
+      setActiveTask(event.active.data.current.task)
+      return
+    }
+  }
+
+  const onDragEnd = (event: DragEndEvent) => {
+    setActiveColumn(null)
+    setActiveTask(null)
+    const { active, over } = event
+    if (!over) return
+
+    const activeColumnId = active.id
+    const overColumnId = over.id
+    if (activeColumnId === overColumnId) return
+
+    setColumns(columns => {
+      const activeColumnIndex = columns.findIndex(col => col.id === activeColumnId)
+      const overColumnIndex = columns.findIndex(col => col.id === overColumnId)
+      return arrayMove(columns, activeColumnIndex, overColumnIndex)
+    })
+  }
+
+  const onDragOver = (event: DragOverEvent) => {
+    const { active, over } = event
+    if (!over) return
+
+    const activeId = active.id
+    const overId = over.id
+
+    if (activeId === overId) return
+    const isActiveATask = active.data.current?.type === 'Task'
+    const isOverATask = over.data.current?.type === 'Task'
+
+    if (!isActiveATask) return
+
+    // dropping a task over another task
+    if (isActiveATask && isOverATask) {
+      setTasks(tasks => {
+        const activeIndex = tasks.findIndex(t => t.id === activeId)
+        const overIndex = tasks.findIndex(t => t.id === overId)
+        tasks[activeIndex].columnId = tasks[overIndex].columnId
+        return arrayMove(tasks, activeIndex, overIndex)
+      })
+    }
+
+    const isOverAColumn = over.data.current?.type === 'Column'
+    if (isActiveATask && isOverAColumn) {
+      setTasks(tasks => {
+        const activeIndex = tasks.findIndex(t => t.id === activeId)
+        tasks[activeIndex].columnId = overId
+        return arrayMove(tasks, activeIndex, activeIndex)
+      })
+    }
+  }
+
+  return (
+    <div className="m-auto flex min-h-screen w-full items-center overflow-x-auto overflow-y-hidden px-[40px]">
+      <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
+        <div className="m-auto flex gap-4">
+          <div className="flex gap-4">
+            <SortableContext items={columnsId}>
+              {columns.map(col => (
+                <ColumnContainer
+                  key={col.id}
+                  column={col}
+                  deleteColumn={deleteColumn}
+                  updateColumn={updateColumn}
+                  createTask={createTask}
+                  tasks={tasks.filter(task => task.columnId === col.id)}
+                  deleteTask={deleteTask}
+                  updateTask={updateTask}
+                />
+              ))}
+            </SortableContext>
+          </div>
+          <button
+            onClick={() => {
+              createNewColumn()
+            }}
+            className="flex w-[350px] min-w-[350px] cursor-pointer gap-2 rounded-lg border-2 p-4 ring-rose-500 hover:ring-2">
+            <PlusIcon />
+            Add Column
+          </button>
+        </div>
+        {createPortal(
+          <DragOverlay>
+            {activeColumn && (
+              <ColumnContainer
+                column={activeColumn}
+                deleteColumn={deleteColumn}
+                updateColumn={updateColumn}
+                createTask={createTask}
+                tasks={tasks.filter(task => task.columnId === activeColumn.id)}
+                deleteTask={deleteTask}
+                updateTask={updateTask}
+              />
+            )}
+            {activeTask && <TaskCard task={activeTask} deleteTask={deleteTask} updateTask={updateTask} />}
+          </DragOverlay>,
+          document.body,
+        )}
+      </DndContext>
+    </div>
+  )
+}
+
+export default KanbanBoard
