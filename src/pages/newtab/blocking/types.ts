@@ -42,6 +42,21 @@ interface ModalGroupEdit {
 
 type ModalGroup = ModalGroupCreate | ModalGroupEdit
 
+interface ModalWebsiteCreate {
+  type: 'create'
+  groupId: Id
+}
+
+interface ModalWebsiteEdit {
+  id: Id
+  groupId: Id
+  name: string
+  domain: string
+  type: 'edit'
+}
+
+type ModalWebsite = ModalWebsiteCreate | ModalWebsiteEdit
+
 interface InitialState {
   websites: Record<Id, WebsiteType>
   groups: Record<Id, GroupType>
@@ -51,10 +66,12 @@ interface InitialState {
 interface State extends InitialState {
   deleteState: DeleteAction | null
   groupState: ModalGroup | null
+  websiteState: ModalWebsite | null
 }
 
 type Actions = {
   addWebsite: (groupId: Id, name: string, domain: string) => void
+  updateWebsite: (websiteId: Id, groupId: Id, name: string, domain: string) => void
   deleteWebsite: (websiteId: Id, groupId: Id) => void
   addGroup: (name: string) => void
   updateGroup: (id: Id, name: string) => void
@@ -63,8 +80,9 @@ type Actions = {
   handleDragEnd: (result: DropResult) => void
   onDelete: (state: DeleteAction | null) => void
   onGroup: (state: ModalGroup | null) => void
+  onWebsite: (state: ModalWebsite | null) => void
 }
 
 type StateAction = State & Actions
 
-export type { Actions, GroupType, Id, State, InitialState, StateAction, WebsiteType, ModalGroup }
+export type { Actions, GroupType, Id, State, InitialState, StateAction, WebsiteType, ModalGroup, ModalWebsite }

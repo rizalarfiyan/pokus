@@ -2,6 +2,7 @@ import Board from './board'
 import DeleteItem from './delete-item'
 import GroupModal from './group-modal'
 import useBlocking from './store'
+import WebsiteModal from './website-modal'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { DragDropContext } from '@hello-pangea/dnd'
 import { useShallow } from 'zustand/react/shallow'
@@ -23,6 +24,7 @@ const Blocking = () => {
       </ScrollArea>
       <DeleteItem />
       <GroupModal />
+      <WebsiteModal />
     </>
   )
 }

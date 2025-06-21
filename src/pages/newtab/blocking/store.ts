@@ -127,6 +127,7 @@ const useBlocking = create<StateAction>()(
       ...initialData,
       deleteState: null,
       groupState: null,
+      websiteState: null,
       addWebsite: (groupId, name, domain) => {
         const newWebsiteId = nanoid()
         const newWebsite: WebsiteType = { id: newWebsiteId, name, domain, isActive: true }
@@ -136,6 +137,18 @@ const useBlocking = create<StateAction>()(
           return {
             websites: { ...state.websites, [newWebsiteId]: newWebsite },
             groups: { ...state.groups, [groupId]: { ...group, websiteIds: newWebsiteIds } },
+          }
+        })
+      },
+      updateWebsite: (websiteId, groupId, name, domain) => {
+        set(state => {
+          const website = state.websites[websiteId]
+          if (!website) return {}
+          const updatedWebsite: WebsiteType = { ...website, name, domain }
+          const group = state.groups[groupId]
+          return {
+            websites: { ...state.websites, [websiteId]: updatedWebsite },
+            groups: { ...state.groups, [groupId]: { ...group } },
           }
         })
       },
@@ -233,6 +246,7 @@ const useBlocking = create<StateAction>()(
       },
       onDelete: state => set({ deleteState: state }),
       onGroup: state => set({ groupState: state }),
+      onWebsite: state => set({ websiteState: state }),
     }),
     {
       name: 'blocking',

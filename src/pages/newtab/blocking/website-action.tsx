@@ -13,9 +13,26 @@ interface WebsiteActionProps {
 }
 
 const WebsiteAction = memo(({ websiteId, groupId, website }: WebsiteActionProps) => {
-  const onDelete = useBlocking(useShallow(state => state.onDelete))
+  const { onDelete, onWebsite } = useBlocking(
+    useShallow(state => ({
+      onDelete: state.onDelete,
+      onWebsite: state.onWebsite,
+    })),
+  )
 
-  const handleDelete = () => {
+  const handleEditWebsite = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    onWebsite({
+      groupId,
+      domain: website.domain,
+      id: websiteId,
+      name: website.name,
+      type: 'edit',
+    })
+  }
+
+  const handleDelete = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     onDelete({
       id: websiteId,
       type: 'website',
@@ -32,7 +49,7 @@ const WebsiteAction = memo(({ websiteId, groupId, website }: WebsiteActionProps)
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={handleEditWebsite}>
           <Edit />
           Edit
         </DropdownMenuItem>

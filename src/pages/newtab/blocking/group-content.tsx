@@ -2,7 +2,6 @@ import useBlocking from './store'
 import WebsiteList from './website-list'
 import { Button } from '@/components/ui/button'
 import { GripVertical, Pencil, PlusIcon, Trash2 } from 'lucide-react'
-import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import type { GroupType, Id } from './types'
 import type { DraggableProvided } from '@hello-pangea/dnd'
@@ -14,23 +13,20 @@ interface GroupContentProps {
 }
 
 const GroupContent = ({ groupId, group, provided }: GroupContentProps) => {
-  const { addWebsite, onDelete, onGroup } = useBlocking(
+  const { onDelete, onGroup, onWebsite } = useBlocking(
     useShallow(state => ({
-      addWebsite: state.addWebsite,
       onDelete: state.onDelete,
       onGroup: state.onGroup,
+      onWebsite: state.onWebsite,
     })),
   )
 
-  const handleAddWebsite = useCallback(() => {
-    const name = prompt('Masukkan nama website (misal: Situs Berita):')
-    if (name) {
-      const domain = prompt('Masukkan domain (misal: news.com):')
-      if (domain) {
-        addWebsite(groupId, name, domain)
-      }
-    }
-  }, [addWebsite, groupId])
+  const handleAddWebsite = () => {
+    onWebsite({
+      groupId,
+      type: 'create',
+    })
+  }
 
   const handleEditGroup = () => {
     onGroup({

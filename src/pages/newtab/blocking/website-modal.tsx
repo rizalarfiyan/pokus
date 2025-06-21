@@ -17,69 +17,78 @@ import { useForm } from 'react-hook-form'
 import * as v from 'valibot'
 import { useShallow } from 'zustand/react/shallow'
 
+const DOMAIN_REGEX = /^(?!-)([a-z0-9-]{1,63}(?<!-)\.)+[a-z]{2,6}$/iu
+
 const schema = v.object({
   name: v.pipe(
-    v.string('Group name is required'),
+    v.string('Website name is required'),
     v.minLength(3, 'Needs to be at least 3 characters'),
     v.maxLength(25, 'Needs to be at most 25 characters'),
+    v.trim(),
+  ),
+  domain: v.pipe(
+    v.string('Domain is required'),
+    v.regex(DOMAIN_REGEX, 'Please enter a valid domain (e.g., rizalarfiyan.com)'),
     v.trim(),
   ),
 })
 
 type ISchema = v.InferInput<typeof schema>
 
-const GroupModal = memo(() => {
-  const { groupState, addGroup, updateGroup, onGroup } = useBlocking(
+const WebsiteModal = memo(() => {
+  const { websiteState, addWebsite, updateWebsite, onWebsite } = useBlocking(
     useShallow(state => ({
-      groupState: state.groupState,
-      addGroup: state.addGroup,
-      updateGroup: state.updateGroup,
-      onGroup: state.onGroup,
+      websiteState: state.websiteState,
+      addWebsite: state.addWebsite,
+      updateWebsite: state.updateWebsite,
+      onWebsite: state.onWebsite,
     })),
   )
 
-  const isEdit = groupState?.type === 'edit'
+  const isEdit = websiteState?.type === 'edit'
 
   const form = useForm<ISchema>({
     resolver: valibotResolver(schema),
     defaultValues: {
       name: '',
+      domain: '',
     },
   })
 
   useEffect(() => {
-    if (!groupState || !isEdit) return
-    form.setValue('name', groupState.name)
-  }, [groupState])
+    if (!websiteState || !isEdit) return
+    form.setValue('name', websiteState.name)
+    form.setValue('domain', websiteState.domain)
+  }, [websiteState])
 
   const onSubmit = (data: ISchema) => {
+    if (!websiteState) return
+
     if (isEdit) {
-      updateGroup(groupState.id, data.name)
+      updateWebsite(websiteState.id, websiteState.groupId, data.name, data.domain)
     } else {
-      addGroup(data.name)
+      addWebsite(websiteState.groupId, data.name, data.domain)
     }
 
     form.reset()
-    onGroup(null)
+    onWebsite(null)
   }
 
   const onOpenChange = (open: boolean) => {
     if (open) return
-    onGroup(null)
+    onWebsite(null)
     form.reset()
   }
 
-  if (!groupState) return null
+  if (!websiteState) return null
 
   return (
-    <Dialog open={!!groupState} onOpenChange={onOpenChange}>
+    <Dialog open={!!websiteState} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Group' : 'Add New Group'}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Website' : 'Add New Website'}</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? 'Update the group details to modify your website blocking settings.'
-              : 'Create a new group to block your websites.'}
+            {isEdit ? 'Update the website information.' : 'Add a new website to your group.'}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -89,9 +98,22 @@ const GroupModal = memo(() => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Group Name</FormLabel>
+                  <FormLabel>Website Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Social Media" {...field} />
+                    <Input placeholder="Rizal Arfiyan" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="domain"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Domain</FormLabel>
+                  <FormControl>
+                    <Input placeholder="rizalarfiyan.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,7 +125,7 @@ const GroupModal = memo(() => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">{isEdit ? 'Edit Group' : 'Add Group'}</Button>
+              <Button type="submit">{isEdit ? 'Edit Website' : 'Add Website'}</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -112,4 +134,4 @@ const GroupModal = memo(() => {
   )
 })
 
-export default GroupModal
+export default WebsiteModal
