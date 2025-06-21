@@ -5,7 +5,7 @@
     "chrome_url_overrides": {
         "newtab": "src/pages/newtab/index.html"
     },
-    "permissions": ["activeTab"],
+    "permissions": ["storage"],
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*", "<all_urls>"],
