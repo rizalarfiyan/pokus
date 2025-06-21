@@ -1,4 +1,4 @@
-import useBlocking from './store'
+import useBlocking, { useModalBlocking } from './store'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -36,16 +36,20 @@ const schema = v.object({
 type ISchema = v.InferInput<typeof schema>
 
 const WebsiteModal = memo(() => {
-  const { websiteState, addWebsite, updateWebsite, onWebsite } = useBlocking(
+  const { addWebsite, updateWebsite } = useBlocking(
     useShallow(state => ({
-      websiteState: state.websiteState,
       addWebsite: state.addWebsite,
       updateWebsite: state.updateWebsite,
+    })),
+  )
+  const { website, onWebsite } = useModalBlocking(
+    useShallow(state => ({
+      website: state.website,
       onWebsite: state.onWebsite,
     })),
   )
 
-  const isEdit = websiteState?.type === 'edit'
+  const isEdit = website?.type === 'edit'
 
   const form = useForm<ISchema>({
     resolver: valibotResolver(schema),
@@ -56,18 +60,18 @@ const WebsiteModal = memo(() => {
   })
 
   useEffect(() => {
-    if (!websiteState || !isEdit) return
-    form.setValue('name', websiteState.name)
-    form.setValue('domain', websiteState.domain)
-  }, [websiteState])
+    if (!website || !isEdit) return
+    form.setValue('name', website.name)
+    form.setValue('domain', website.domain)
+  }, [website])
 
   const onSubmit = (data: ISchema) => {
-    if (!websiteState) return
+    if (!website) return
 
     if (isEdit) {
-      updateWebsite(websiteState.id, websiteState.groupId, data.name, data.domain)
+      updateWebsite(website.id, website.groupId, data.name, data.domain)
     } else {
-      addWebsite(websiteState.groupId, data.name, data.domain)
+      addWebsite(website.groupId, data.name, data.domain)
     }
 
     form.reset()
@@ -80,10 +84,10 @@ const WebsiteModal = memo(() => {
     form.reset()
   }
 
-  if (!websiteState) return null
+  if (!website) return null
 
   return (
-    <Dialog open={!!websiteState} onOpenChange={onOpenChange}>
+    <Dialog open={!!website} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Website' : 'Add New Website'}</DialogTitle>

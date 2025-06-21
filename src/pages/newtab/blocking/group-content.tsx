@@ -1,4 +1,4 @@
-import useBlocking from './store'
+import { useModalBlocking } from './store'
 import WebsiteList from './website-list'
 import { Button } from '@/components/ui/button'
 import { GripVertical, Pencil, PlusIcon, Trash2 } from 'lucide-react'
@@ -13,7 +13,7 @@ interface GroupContentProps {
 }
 
 const GroupContent = ({ groupId, group, provided }: GroupContentProps) => {
-  const { onDelete, onGroup, onWebsite } = useBlocking(
+  const { onDelete, onGroup, onWebsite } = useModalBlocking(
     useShallow(state => ({
       onDelete: state.onDelete,
       onGroup: state.onGroup,

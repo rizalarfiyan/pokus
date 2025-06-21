@@ -1,4 +1,4 @@
-import useBlocking from './store'
+import { useModalBlocking } from './store'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react'
@@ -13,7 +13,7 @@ interface WebsiteActionProps {
 }
 
 const WebsiteAction = memo(({ websiteId, groupId, website }: WebsiteActionProps) => {
-  const { onDelete, onWebsite } = useBlocking(
+  const { onDelete, onWebsite } = useModalBlocking(
     useShallow(state => ({
       onDelete: state.onDelete,
       onWebsite: state.onWebsite,

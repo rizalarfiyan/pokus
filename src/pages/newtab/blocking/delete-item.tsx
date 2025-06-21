@@ -1,4 +1,4 @@
-import useBlocking from './store'
+import useBlocking, { useModalBlocking } from './store'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,12 +13,17 @@ import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 
 const DeleteItem = () => {
-  const { deleteState, onDelete, deleteWebsite, deleteGroup } = useBlocking(
+  const { deleteWebsite, deleteGroup } = useBlocking(
     useShallow(state => ({
-      deleteState: state.deleteState,
-      onDelete: state.onDelete,
       deleteWebsite: state.deleteWebsite,
       deleteGroup: state.deleteGroup,
+    })),
+  )
+
+  const { delete: deleteState, onDelete } = useModalBlocking(
+    useShallow(state => ({
+      delete: state.delete,
+      onDelete: state.onDelete,
     })),
   )
 

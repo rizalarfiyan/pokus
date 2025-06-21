@@ -1,4 +1,4 @@
-import useBlocking from './store'
+import useBlocking, { useModalBlocking } from './store'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -29,16 +29,21 @@ const schema = v.object({
 type ISchema = v.InferInput<typeof schema>
 
 const GroupModal = memo(() => {
-  const { groupState, addGroup, updateGroup, onGroup } = useBlocking(
+  const { addGroup, updateGroup } = useBlocking(
     useShallow(state => ({
-      groupState: state.groupState,
       addGroup: state.addGroup,
       updateGroup: state.updateGroup,
+    })),
+  )
+
+  const { group, onGroup } = useModalBlocking(
+    useShallow(state => ({
+      group: state.group,
       onGroup: state.onGroup,
     })),
   )
 
-  const isEdit = groupState?.type === 'edit'
+  const isEdit = group?.type === 'edit'
 
   const form = useForm<ISchema>({
     resolver: valibotResolver(schema),
@@ -48,13 +53,13 @@ const GroupModal = memo(() => {
   })
 
   useEffect(() => {
-    if (!groupState || !isEdit) return
-    form.setValue('name', groupState.name)
-  }, [groupState])
+    if (!group || !isEdit) return
+    form.setValue('name', group.name)
+  }, [group])
 
   const onSubmit = (data: ISchema) => {
     if (isEdit) {
-      updateGroup(groupState.id, data.name)
+      updateGroup(group.id, data.name)
     } else {
       addGroup(data.name)
     }
@@ -69,10 +74,10 @@ const GroupModal = memo(() => {
     form.reset()
   }
 
-  if (!groupState) return null
+  if (!group) return null
 
   return (
-    <Dialog open={!!groupState} onOpenChange={onOpenChange}>
+    <Dialog open={!!group} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Group' : 'Add New Group'}</DialogTitle>

@@ -1,17 +1,13 @@
 import Group from './group'
-import useBlocking from './store'
+import useBlocking, { useModalBlocking } from './store'
 import { Droppable } from '@hello-pangea/dnd'
 import { Plus } from 'lucide-react'
 import { memo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 
 const Board = memo(() => {
-  const { groupOrder, onGroup } = useBlocking(
-    useShallow(state => ({
-      groupOrder: state.groupOrder,
-      onGroup: state.onGroup,
-    })),
-  )
+  const groupOrder = useBlocking(useShallow(state => state.groupOrder))
+  const onGroup = useModalBlocking(useShallow(state => state.onGroup))
 
   const onAddGroup = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()

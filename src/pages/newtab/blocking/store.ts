@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { GroupType, InitialState, StateAction, WebsiteType } from './types'
+import type { GroupType, ModalStateAction, State, StateAction, WebsiteType } from './types'
 
-const initialData: InitialState = {
+const initialData: State = {
   websites: {
     '1': {
       id: '1',
@@ -125,9 +125,6 @@ const useBlocking = create<StateAction>()(
   persist(
     set => ({
       ...initialData,
-      deleteState: null,
-      groupState: null,
-      websiteState: null,
       addWebsite: (groupId, name, domain) => {
         const newWebsiteId = nanoid()
         const newWebsite: WebsiteType = { id: newWebsiteId, name, domain, isActive: true }
@@ -244,9 +241,6 @@ const useBlocking = create<StateAction>()(
           }
         })
       },
-      onDelete: state => set({ deleteState: state }),
-      onGroup: state => set({ groupState: state }),
-      onWebsite: state => set({ websiteState: state }),
     }),
     {
       name: 'blocking',
@@ -254,4 +248,14 @@ const useBlocking = create<StateAction>()(
   ),
 )
 
+const useModalBlocking = create<ModalStateAction>(set => ({
+  delete: null,
+  group: null,
+  website: null,
+  onDelete: state => set({ delete: state }),
+  onGroup: state => set({ group: state }),
+  onWebsite: state => set({ website: state }),
+}))
+
 export default useBlocking
+export { useModalBlocking }
