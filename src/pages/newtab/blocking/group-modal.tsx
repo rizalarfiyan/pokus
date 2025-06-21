@@ -8,13 +8,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { valibotResolver } from '@hookform/resolvers/valibot'
-import { Plus } from 'lucide-react'
-import { memo, useState } from 'react'
+import { memo, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as v from 'valibot'
 import { useShallow } from 'zustand/react/shallow'
@@ -23,46 +21,64 @@ const schema = v.object({
   name: v.pipe(
     v.string('Group name is required'),
     v.minLength(3, 'Needs to be at least 3 characters'),
-    v.maxLength(50, 'Needs to be at most 50 characters'),
+    v.maxLength(25, 'Needs to be at most 25 characters'),
     v.trim(),
   ),
 })
 
 type ISchema = v.InferInput<typeof schema>
 
-const AddGroup = memo(() => {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
-  const addGroupAction = useBlocking(useShallow(state => state.addGroup))
+const GroupModal = memo(() => {
+  const { groupState, addGroup, updateGroup, onGroup } = useBlocking(
+    useShallow(state => ({
+      groupState: state.groupState,
+      addGroup: state.addGroup,
+      updateGroup: state.updateGroup,
+      onGroup: state.onGroup,
+    })),
+  )
+
+  const isEdit = groupState?.type === 'edit'
 
   const form = useForm<ISchema>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      name: '',
+      name: isEdit ? groupState.name : '',
     },
   })
 
+  useEffect(() => {
+    if (!groupState || !isEdit) return
+    form.setValue('name', isEdit ? groupState.name : '')
+  }, [groupState])
+
   const onSubmit = (data: ISchema) => {
-    addGroupAction(data.name)
+    if (isEdit) {
+      updateGroup(groupState.id, data.name)
+    } else {
+      addGroup(data.name)
+    }
+
     form.reset()
-    setIsOpen(false)
+    onGroup(null)
   }
 
+  const onOpenChange = (open: boolean) => {
+    if (!open) onGroup(null)
+  }
+
+  if (!groupState) return null
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          className="border-background bg-muted/20 hover:bg-primary/10 m-2 flex h-[calc(100vh_-_10rem)] w-80 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 backdrop-blur-sm transition-colors duration-300">
-          <div className="text-accent-foreground flex flex-col items-center justify-center gap-2">
-            <Plus className="size-10" />
-            <span className="font-bold">Add Group</span>
-          </div>
-        </button>
-      </DialogTrigger>
+    <Dialog open={!!groupState} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Group</DialogTitle>
-          <DialogDescription>Create a new group to blocking your websites.</DialogDescription>
+          <DialogTitle>{isEdit ? 'Edit Group' : 'Add New Group'}</DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? 'Update the group details to modify your website blocking settings.'
+              : 'Create a new group to block your websites.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -71,7 +87,7 @@ const AddGroup = memo(() => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Group Name</FormLabel>
+                  <FormLabel>Group Name {isEdit ? groupState.name : ''}</FormLabel>
                   <FormControl>
                     <Input placeholder="Social Media" {...field} />
                   </FormControl>
@@ -85,7 +101,7 @@ const AddGroup = memo(() => {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Add Group</Button>
+              <Button type="submit">{isEdit ? 'Edit Group' : 'Add Group'}</Button>
             </DialogFooter>
           </form>
         </Form>
@@ -94,4 +110,4 @@ const AddGroup = memo(() => {
   )
 })
 
-export default AddGroup
+export default GroupModal

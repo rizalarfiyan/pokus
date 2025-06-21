@@ -35,14 +35,15 @@ const DeleteItem = () => {
 
   if (!deleteState) return null
   const { type, name } = deleteState
+  const isGroup = type === 'group'
 
   return (
     <AlertDialog open={!!deleteState} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete {type === 'group' ? 'Group' : 'Website'}</AlertDialogTitle>
+          <AlertDialogTitle>Delete {isGroup ? 'Group' : 'Website'}</AlertDialogTitle>
           <AlertDialogDescription>
-            {type === 'group'
+            {isGroup
               ? `Are you sure you want to delete the "${name}" group? This will permanently delete the group and all items within it. This action cannot be undone.`
               : `Are you sure you want to delete "${name}"? This action cannot be undone.`}
           </AlertDialogDescription>

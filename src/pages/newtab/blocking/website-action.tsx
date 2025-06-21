@@ -2,7 +2,7 @@ import useBlocking from './store'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react'
-import { memo, useCallback } from 'react'
+import { memo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import type { Id, WebsiteType } from './types'
 
@@ -15,14 +15,14 @@ interface WebsiteActionProps {
 const WebsiteAction = memo(({ websiteId, groupId, website }: WebsiteActionProps) => {
   const onDelete = useBlocking(useShallow(state => state.onDelete))
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = () => {
     onDelete({
       id: websiteId,
       type: 'website',
       groupId,
       name: website.name,
     })
-  }, [onDelete, websiteId, groupId, website])
+  }
 
   return (
     <DropdownMenu>

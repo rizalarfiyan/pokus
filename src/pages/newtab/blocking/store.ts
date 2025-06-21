@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { GroupType, InitialState, StateAction, WebsiteType } from './types'
@@ -125,8 +126,9 @@ const useBlocking = create<StateAction>()(
     set => ({
       ...initialData,
       deleteState: null,
+      groupState: null,
       addWebsite: (groupId, name, domain) => {
-        const newWebsiteId = `site-${crypto.randomUUID()}`
+        const newWebsiteId = nanoid()
         const newWebsite: WebsiteType = { id: newWebsiteId, name, domain, isActive: true }
         set(state => {
           const group = state.groups[groupId]
@@ -150,12 +152,20 @@ const useBlocking = create<StateAction>()(
         })
       },
       addGroup: name => {
-        const newGroupId = `group-${crypto.randomUUID()}`
+        const newGroupId = nanoid()
         const newGroup: GroupType = { id: newGroupId, name, websiteIds: [] }
         set(state => ({
           groups: { ...state.groups, [newGroupId]: newGroup },
           groupOrder: [...state.groupOrder, newGroupId],
         }))
+      },
+      updateGroup: (id, name) => {
+        set(state => {
+          const group = state.groups[id]
+          return {
+            groups: { ...state.groups, [id]: { ...group, name } },
+          }
+        })
       },
       deleteGroup: groupId => {
         set(state => {
@@ -222,6 +232,7 @@ const useBlocking = create<StateAction>()(
         })
       },
       onDelete: state => set({ deleteState: state }),
+      onGroup: state => set({ groupState: state }),
     }),
     {
       name: 'blocking',

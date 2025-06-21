@@ -1,5 +1,6 @@
 import Board from './board'
 import DeleteItem from './delete-item'
+import GroupModal from './group-modal'
 import useBlocking from './store'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { DragDropContext } from '@hello-pangea/dnd'
@@ -21,6 +22,7 @@ const Blocking = () => {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <DeleteItem />
+      <GroupModal />
     </>
   )
 }
