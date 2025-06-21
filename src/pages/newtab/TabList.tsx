@@ -48,7 +48,7 @@ const TabList = ({ before, after }: TabListProps) => {
     <Tabs value={activeTab} onValueChange={setActiveTab} className="flex min-h-screen flex-1 items-center gap-4 p-4">
       <div className="flex w-full items-center justify-between px-2">
         {before}
-        <TabsList className="bg-muted/10 mx-auto h-auto gap-3 p-2">
+        <TabsList className="bg-muted/10 mx-auto h-auto gap-3 p-2 backdrop-blur-sm">
           {tabsContents.map(tab => (
             <TabsTrigger
               key={tab.value}
