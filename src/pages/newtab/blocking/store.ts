@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { GroupType, State, StateAction, WebsiteType } from './types'
+import type { GroupType, InitialState, StateAction, WebsiteType } from './types'
 
-const initialData: State = {
+const initialData: InitialState = {
   websites: {
     '1': {
       id: '1',
@@ -124,6 +124,7 @@ const useBlocking = create<StateAction>()(
   persist(
     set => ({
       ...initialData,
+      deleteState: null,
       addWebsite: (groupId, name, domain) => {
         const newWebsiteId = `site-${crypto.randomUUID()}`
         const newWebsite: WebsiteType = { id: newWebsiteId, name, domain, isActive: true }
@@ -220,6 +221,7 @@ const useBlocking = create<StateAction>()(
           }
         })
       },
+      onDelete: state => set({ deleteState: state }),
     }),
     {
       name: 'blocking',

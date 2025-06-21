@@ -52,7 +52,7 @@ const AddGroup = memo(() => {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="border-foreground/50 bg-muted/30 m-2 flex h-[calc(100vh_-_10rem)] w-80 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 backdrop-blur-sm">
+          className="border-background bg-muted/20 hover:bg-primary/10 m-2 flex h-[calc(100vh_-_10rem)] w-80 cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 backdrop-blur-sm transition-colors duration-300">
           <div className="text-accent-foreground flex flex-col items-center justify-center gap-2">
             <Plus className="size-10" />
             <span className="font-bold">Add Group</span>

@@ -15,10 +15,29 @@ interface GroupType {
   websiteIds: Id[]
 }
 
-interface State {
-  websites: { [key: Id]: WebsiteType }
-  groups: { [key: Id]: GroupType }
+interface DeleteActionWebsite {
+  id: Id
+  groupId: Id
+  type: 'website'
+  name: string
+}
+
+interface DeleteActionGroup {
+  id: Id
+  type: 'group'
+  name: string
+}
+
+type DeleteAction = DeleteActionWebsite | DeleteActionGroup
+
+interface InitialState {
+  websites: Record<Id, WebsiteType>
+  groups: Record<Id, GroupType>
   groupOrder: Id[]
+}
+
+interface State extends InitialState {
+  deleteState: DeleteAction | null
 }
 
 type Actions = {
@@ -28,8 +47,9 @@ type Actions = {
   deleteGroup: (groupId: Id) => void
   toggleWebsiteActive: (websiteId: Id) => void
   handleDragEnd: (result: DropResult) => void
+  onDelete: (state: DeleteAction | null) => void
 }
 
 type StateAction = State & Actions
 
-export type { Actions, GroupType, Id, State, StateAction, WebsiteType }
+export type { Actions, GroupType, Id, State, InitialState, StateAction, WebsiteType }

@@ -14,10 +14,10 @@ interface GroupContentProps {
 }
 
 const GroupContent = ({ groupId, group, provided }: GroupContentProps) => {
-  const { addWebsite, deleteGroup } = useBlocking(
+  const { addWebsite, onDelete } = useBlocking(
     useShallow(state => ({
       addWebsite: state.addWebsite,
-      deleteGroup: state.deleteGroup,
+      onDelete: state.onDelete,
     })),
   )
 
@@ -32,10 +32,12 @@ const GroupContent = ({ groupId, group, provided }: GroupContentProps) => {
   }, [addWebsite, groupId])
 
   const handleDelete = useCallback(() => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus grup ini? Semua website di dalamnya akan ikut terhapus.')) {
-      deleteGroup(groupId)
-    }
-  }, [deleteGroup, groupId])
+    onDelete({
+      id: groupId,
+      type: 'group',
+      name: group.name,
+    })
+  }, [onDelete, groupId])
 
   return (
     <div

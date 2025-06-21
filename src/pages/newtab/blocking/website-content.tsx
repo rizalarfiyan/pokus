@@ -41,7 +41,7 @@ const WebsiteContent = memo(({ websiteId, groupId, website, provided, snapshot }
     </div>
     <div className="flex flex-shrink-0 items-center gap-2">
       <WebsiteActiveToggle websiteId={websiteId} website={website} />
-      <WebsiteAction websiteId={websiteId} groupId={groupId} />
+      <WebsiteAction websiteId={websiteId} groupId={groupId} website={website} />
     </div>
   </div>
 ))

@@ -4,16 +4,25 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Edit, MoreHorizontal, Trash2 } from 'lucide-react'
 import { memo, useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import type { Id } from './types'
+import type { Id, WebsiteType } from './types'
 
-const WebsiteAction = memo(({ websiteId, groupId }: { websiteId: Id; groupId: Id }) => {
-  const deleteWebsite = useBlocking(useShallow(state => state.deleteWebsite))
+interface WebsiteActionProps {
+  websiteId: Id
+  groupId: Id
+  website: WebsiteType
+}
+
+const WebsiteAction = memo(({ websiteId, groupId, website }: WebsiteActionProps) => {
+  const onDelete = useBlocking(useShallow(state => state.onDelete))
 
   const handleDelete = useCallback(() => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus website ini?')) {
-      deleteWebsite(websiteId, groupId)
-    }
-  }, [deleteWebsite, websiteId, groupId])
+    onDelete({
+      id: websiteId,
+      type: 'website',
+      groupId,
+      name: website.name,
+    })
+  }, [onDelete, websiteId, groupId, website])
 
   return (
     <DropdownMenu>
