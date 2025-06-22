@@ -1,4 +1,3 @@
-import { cn } from '@/lib/utils'
 import { memo } from 'react'
 
 interface StackedBarProps {
@@ -14,9 +13,9 @@ const StackedBar = memo(({ focus, sort, long }: StackedBarProps) => {
   const longPercentage = (long / total) * 100
 
   const segments = [
-    { value: focus, percentage: focusPercentage, label: 'Focus', color: 'bg-sky-500' },
-    { value: sort, percentage: sortPercentage, label: 'Sort', color: 'bg-emerald-500' },
-    { value: long, percentage: longPercentage, label: 'Long', color: 'bg-amber-400' },
+    { value: focus, percentage: focusPercentage, label: 'Focus', color: 'var(--chart-1)' },
+    { value: sort, percentage: sortPercentage, label: 'Sort', color: 'var(--chart-2)' },
+    { value: long, percentage: longPercentage, label: 'Long', color: 'var(--chart-3)' },
   ]
 
   return (
@@ -25,8 +24,11 @@ const StackedBar = memo(({ focus, sort, long }: StackedBarProps) => {
         {segments.map((segment, index) => (
           <div
             key={index}
-            style={{ width: `${segment.percentage}%` }}
-            className={cn('flex h-full items-center justify-center text-sm font-bold text-white', segment.color)}>
+            style={{
+              width: `${segment.percentage}%`,
+              background: segment.color,
+            }}
+            className="flex h-full items-center justify-center text-sm font-bold text-white">
             {segment.value}
           </div>
         ))}

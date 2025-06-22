@@ -1,7 +1,8 @@
+import Ambience from './ambience'
 import Blocking from './blocking'
 import Pomodoro from './pomodoro'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ChartLine, GlobeLock, ListMusic, Target, Trophy } from 'lucide-react'
+import { ChartLine, GlobeLock, ListMusic, Timer, Trophy } from 'lucide-react'
 import { useState } from 'react'
 
 const tabsContents = [
@@ -9,7 +10,7 @@ const tabsContents = [
     value: 'pomodoro',
     label: 'Pomodoro',
     content: <Pomodoro />,
-    icon: Target,
+    icon: Timer,
   },
   {
     value: 'blocking',
@@ -20,7 +21,7 @@ const tabsContents = [
   {
     value: 'ambience',
     label: 'Ambience',
-    content: 'Page Ambience!',
+    content: <Ambience />,
     icon: ListMusic,
   },
   {
