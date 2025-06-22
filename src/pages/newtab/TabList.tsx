@@ -1,13 +1,14 @@
 import Blocking from './blocking'
+import Pomodoro from './pomodoro'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GlobeLock, ListMusic, Target, Trophy } from 'lucide-react'
 import { useState } from 'react'
 
 const tabsContents = [
   {
-    value: 'home',
-    label: 'Home',
-    content: 'Page Home!',
+    value: 'pomodoro',
+    label: 'Pomodoro',
+    content: <Pomodoro />,
     icon: <Target className="size-5" />,
   },
   {
