@@ -9,31 +9,31 @@ const tabsContents = [
     value: 'pomodoro',
     label: 'Pomodoro',
     content: <Pomodoro />,
-    icon: <Target className="size-5" />,
+    icon: Target,
   },
   {
     value: 'blocking',
     label: 'Blocking',
     content: <Blocking />,
-    icon: <GlobeLock className="size-5" />,
+    icon: GlobeLock,
   },
   {
     value: 'ambience',
     label: 'Ambience',
     content: 'Page Ambience!',
-    icon: <ListMusic className="size-5" />,
+    icon: ListMusic,
   },
   {
     value: 'statistic',
     label: 'Statistic',
     content: 'Page Statistic!',
-    icon: <ChartLine className="size-5" />,
+    icon: ChartLine,
   },
   {
     value: 'achievement',
     label: 'Achievement',
     content: 'Page Achievement!',
-    icon: <Trophy className="size-5" />,
+    icon: Trophy,
   },
 ]
 
@@ -55,7 +55,7 @@ const TabList = ({ before, after }: TabListProps) => {
               key={tab.value}
               value={tab.value}
               className="text-background data-[state=active]:text-primary p-2 px-4 font-bold">
-              {tab.icon}
+              <tab.icon className="size-5" />
               <span>{tab.label}</span>
             </TabsTrigger>
           ))}
