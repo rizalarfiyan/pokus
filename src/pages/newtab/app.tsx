@@ -1,7 +1,7 @@
-import FullScreen from './partials/FullScreen'
-import Settings from './partials/Settings'
-import Theme from './partials/Theme'
-import TabList from './TabList'
+import FullScreen from './partials/full-screen'
+import Theme from './partials/theme'
+import Settings from './settings'
+import TabList from './tab-list'
 import Logo from '@/components/logo'
 
 const IMAGE =
