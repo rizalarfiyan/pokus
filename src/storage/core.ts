@@ -41,14 +41,10 @@ let globalSessionAccessLevelFlag: StorageConfigType['sessionAccessForContentScri
  * Checks if the storage permission is granted in the manifest.json.
  */
 const checkStoragePermission = (storageEnum: StorageEnum): void => {
-  console.log('init....')
-
   if (!chrome) {
     return
   }
 
-  console.log('checking permissions for storage', storageEnum)
-  console.log('chrome.storage', chrome.storage)
   if (!chrome.storage[storageEnum]) {
     throw new Error(`"storage" permission in manifest.ts: "storage ${storageEnum}" isn't defined`)
   }

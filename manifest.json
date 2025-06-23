@@ -2,10 +2,15 @@
     "manifest_version": 3,
     "name": "Pokus",
     "description": "Focus Smarter. Work Harder. Win Your Day!",
-    "chrome_url_overrides": {
-        "newtab": "src/pages/newtab/index.html"
+    "options_ui": {
+        "page": "src/pages/newtab/index.html",
+        "open_in_tab": true
     },
-    "permissions": ["storage"],
+    "chrome_url_overrides": {
+        "newtab": "src/pages/newtab/index.html",
+        "offscreen": "src/pages/offscreen/index.html"
+    },
+    "permissions": ["storage", "alarms", "notifications", "offscreen"],
     "content_scripts": [
         {
             "matches": ["http://*/*", "https://*/*", "<all_urls>"],
