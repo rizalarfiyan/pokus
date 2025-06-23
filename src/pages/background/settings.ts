@@ -17,7 +17,7 @@ const DEFAULT_SETTINGS: ISettings = {
 
   showDesktopNotifications: true,
   showNewTabNotifications: true,
-  notificationSound: '/sounds/notification.mp3',
+  notificationSound: '/sounds/notification-1.ogg',
 }
 
 class Settings {

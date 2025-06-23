@@ -12,6 +12,7 @@ interface ViewProps {
   sendCommand: (action: string, payload?: unknown) => void
 }
 
+// TODO: change the session type to focus
 const View = memo(({ timer, sendCommand }: ViewProps) => {
   const isRunning = timer.state === TimerState.Running
 
@@ -37,7 +38,7 @@ const View = memo(({ timer, sendCommand }: ViewProps) => {
         value={timer.type}
         onValueChange={handleSessionChange}
         disabled={isRunning}>
-        <Action value={SessionType.Pomodoro} name="Pomodoro" />
+        <Action value={SessionType.Pomodoro} name="Focus" />
         <Action value={SessionType.ShortBreak} name="Sort Break" />
         <Action value={SessionType.LongBreak} name="Long Break" />
       </RadioGroup>
