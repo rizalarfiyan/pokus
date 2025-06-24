@@ -5,7 +5,7 @@ type WrappedPromise = ReturnType<typeof wrapPromise>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const storageMap: Map<BaseStorageType<any>, WrappedPromise> = new Map()
 
-const wrapPromise = <R,>(promise: Promise<R>) => {
+const wrapPromise = <R>(promise: Promise<R>) => {
   let status = 'pending'
   let result: R
 

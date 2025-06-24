@@ -1,27 +1,13 @@
-type Preset = 'sort-burst' | 'classic' | 'extended' | 'deep-work' | 'custom'
-
-interface PomodoroTime {
-  focus: number
-  sort: number
-  long: number
-}
-
-interface TimePreset extends PomodoroTime {
-  value: Preset
-  name: string
-  description: string
-}
-
-interface State {
-  presets: TimePreset[]
-  preset: Preset
-}
+import type { LongBreakInterval, State, NotificationShow, Preset, Session, TimePreset } from '@/types/pomodoro'
 
 type Actions = {
   changePreset: (preset: Preset) => void
-  changeCustomPreset: (time: PomodoroTime) => void
+  changeCustomPreset: (time: TimePreset) => void
+  changeLongBreakInterval: (interval: LongBreakInterval) => void
+  toggleShowNotification: (session: Session, show: NotificationShow) => void
+  changeAudioNotification: (session: Session, audio: string | null) => void
 }
 
 type StateAction = State & Actions
 
-export type { Preset, TimePreset, State, Actions, StateAction, PomodoroTime }
+export type { Actions, State, StateAction }
