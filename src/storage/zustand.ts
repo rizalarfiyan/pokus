@@ -12,7 +12,6 @@ const chromeStorage = <T extends object>(config: StateCreator<T>, options: Chrom
 
   const deepMerge = createDeepMerge()
   let isUpdateFromLocal = false
-  let isHydrated = true
 
   type StoreApiDestroy = StoreApi<T> & { destroy?: () => void }
 
@@ -39,10 +38,6 @@ const chromeStorage = <T extends object>(config: StateCreator<T>, options: Chrom
 
     const savedSetState = api.setState
     api.setState = (state, replace) => {
-      if (isHydrated) {
-        isHydrated = false
-        return
-      }
       savedSetState(state as T, replace as false | undefined)
       isUpdateFromLocal = true
       void setItem(get())

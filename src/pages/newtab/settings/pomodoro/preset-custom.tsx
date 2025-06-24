@@ -1,8 +1,8 @@
 import PresetCustomSlider from './preset-custom-slider'
 import StackedBar from './stack-bar'
 import usePomodoroSetting from './store'
-import useDebounce from '@/hooks/use-debounce'
-import { useCallback, useEffect, useState } from 'react'
+import useDebounceCallback from '@/hooks/use-debounce-callback'
+import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import type { TimePreset } from '@/types/pomodoro'
 
@@ -14,27 +14,14 @@ const PresetCustom = () => {
     })),
   )
 
-  const [values, setValues] = useState<TimePreset>({
-    focus: custom.focus,
-    short: custom.short,
-    long: custom.long,
-  })
+  const handleUpdateStore = useCallback(
+    (newValues: TimePreset) => {
+      changeCustomPreset(newValues)
+    },
+    [changeCustomPreset],
+  )
 
-  useEffect(() => {
-    // todo: change with deep equal
-    if (values.focus !== custom.focus || values.short !== custom.short || values.long !== custom.long) {
-      setValues({
-        focus: custom.focus,
-        short: custom.short,
-        long: custom.long,
-      })
-    }
-  }, [custom])
-
-  const debounce = useDebounce(values, 750)
-  useEffect(() => {
-    changeCustomPreset(debounce)
-  }, [debounce, changeCustomPreset])
+  const [values, setValues] = useDebounceCallback(custom, handleUpdateStore, 750)
 
   const handleFocusChange = useCallback((val: number[]) => {
     setValues(prev => ({ ...prev, focus: val[0] }))

@@ -1,13 +1,13 @@
+import deepEqual from 'fast-deep-equal'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 
-const useDebouncedToggle = <T>(
+const useDebounceCallback = <T>(
   sourceValue: T,
-  updateCallback: () => void,
+  updateCallback: (newValue: T) => void,
   delay: number,
 ): [T, Dispatch<SetStateAction<T>>] => {
   const [localValue, setLocalValue] = useState<T>(sourceValue)
-
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const memoizedUpdateCallback = useCallback(updateCallback, [updateCallback])
 
@@ -20,12 +20,10 @@ const useDebouncedToggle = <T>(
       clearTimeout(timeoutRef.current)
     }
 
-    if (localValue === sourceValue) {
-      return
-    }
+    if (deepEqual(localValue, sourceValue)) return
 
     timeoutRef.current = setTimeout(() => {
-      memoizedUpdateCallback()
+      memoizedUpdateCallback(localValue)
     }, delay)
 
     return () => {
@@ -38,4 +36,4 @@ const useDebouncedToggle = <T>(
   return [localValue, setLocalValue]
 }
 
-export default useDebouncedToggle
+export default useDebounceCallback
