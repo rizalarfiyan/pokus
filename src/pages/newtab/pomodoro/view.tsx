@@ -1,8 +1,7 @@
-import Action from './action'
 import Gauge from './gauge'
+import Session from './session'
 import { formatTime, remainingPercent } from './utils'
-import { RadioGroup } from '@/components/ui/radio-group'
-import { SessionType, TimerState } from '@/constants/pomodoro'
+import { TimerState } from '@/constants/pomodoro'
 import { Pause, Play } from 'lucide-react'
 import { memo, useCallback } from 'react'
 import type { ITimer } from '@/pages/background/timer'
@@ -23,24 +22,9 @@ const View = memo(({ timer, sendCommand }: ViewProps) => {
     }
   }, [isRunning, sendCommand])
 
-  const handleSessionChange = useCallback(
-    (type: SessionType) => {
-      sendCommand('setSessionType', { type })
-    },
-    [sendCommand],
-  )
-
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center">
-      <RadioGroup
-        className="relative z-1 mt-[5rem] mb-6 flex items-center gap-4"
-        value={timer.type}
-        onValueChange={handleSessionChange}
-        disabled={isRunning}>
-        <Action value={SessionType.Focus} name="Focus" />
-        <Action value={SessionType.Short} name="Sort Break" />
-        <Action value={SessionType.Long} name="Long Break" />
-      </RadioGroup>
+      <Session sendCommand={sendCommand} type={timer.type} isRunning={isRunning} />
       <div className="text-[10rem] leading-none font-bold">{formatTime(timer.remainingTime)}</div>
       <button
         type="button"

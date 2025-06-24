@@ -8,12 +8,12 @@ interface StackedBarProps {
 const StackedBar = memo(({ value: { focus, short, long } }: StackedBarProps) => {
   const total = focus + short + long
   const focusPercentage = (focus / total) * 100
-  const sortPercentage = (short / total) * 100
+  const shortPercentage = (short / total) * 100
   const longPercentage = (long / total) * 100
 
   const segments = [
     { value: focus, percentage: focusPercentage, label: 'Focus', color: 'var(--chart-1)' },
-    { value: short, percentage: sortPercentage, label: 'Sort', color: 'var(--chart-2)' },
+    { value: short, percentage: shortPercentage, label: 'Short', color: 'var(--chart-2)' },
     { value: long, percentage: longPercentage, label: 'Long', color: 'var(--chart-3)' },
   ]
 

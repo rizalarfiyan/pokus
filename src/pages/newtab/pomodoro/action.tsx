@@ -1,6 +1,5 @@
 import FormatMilliseconds from './format-millisecond'
 import { RadioGroupItem } from '@/components/ui/radio-group'
-import { memo } from 'react'
 
 interface ActionProps {
   name: string
@@ -8,7 +7,7 @@ interface ActionProps {
   duration?: number
 }
 
-const Action = memo(({ name, value, duration = 0 }: ActionProps) => {
+const Action = ({ name, value, duration = 0 }: ActionProps) => {
   const id = `pomodoro-${value}`
   return (
     <label
@@ -19,6 +18,6 @@ const Action = memo(({ name, value, duration = 0 }: ActionProps) => {
       <span className="text-sm font-bold">{name}</span>
     </label>
   )
-})
+}
 
 export default Action

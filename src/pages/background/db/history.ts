@@ -1,38 +1,11 @@
 import dayjs from 'dayjs'
 import Dexie from 'dexie'
+import type { IDailyStat, ISession } from '@/types/database'
 import type { Table } from 'dexie'
 
-interface ISession {
-  id?: number
-  start_date: number
-  end_date: number
-  type: 'pomodoro' | 'sort' | 'long'
-  has_valid_cycle: boolean
-}
-
-interface IPerDayStatistics {
-  id?: number
-  date: number
-
-  pomodoro: number
-  sort: number
-  long: number
-  nc_pomodoro: number
-  nc_sort: number
-  nc_long: number
-
-  time_pomodoro: number
-  time_sort: number
-  time_long: number
-  time_nc_pomodoro: number
-  time_nc_sort: number
-  time_nc_long: number
-}
-
 class HistoryDB extends Dexie {
-  public sessions!: Table<ISession>
-
-  public dailyStats!: Table<IPerDayStatistics>
+  public sessions!: Table<ISession, number>
+  public dailyStats!: Table<IDailyStat, number>
 
   constructor() {
     super('history')
@@ -58,8 +31,8 @@ class HistoryDB extends Dexie {
     const duration = session.end_date - session.start_date
 
     const existingDayStat = await this.dailyStats.where('date').equals(startOfDay).first()
-    const counterField = `${session.has_valid_cycle ? '' : 'nc_'}${session.type}` as keyof IPerDayStatistics
-    const timeField = `time_${session.has_valid_cycle ? '' : 'nc_'}${session.type}` as keyof IPerDayStatistics
+    const counterField = `${session.has_valid_cycle ? '' : 'nc_'}${session.type}` as keyof IDailyStat
+    const timeField = `time_${session.has_valid_cycle ? '' : 'nc_'}${session.type}` as keyof IDailyStat
 
     if (existingDayStat) {
       await this.dailyStats.update(existingDayStat.id!, {
@@ -67,19 +40,19 @@ class HistoryDB extends Dexie {
         [timeField]: ((existingDayStat[timeField] as number) || 0) + duration,
       })
     } else {
-      const newDayStat: IPerDayStatistics = {
+      const newDayStat: IDailyStat = {
         date: startOfDay,
-        pomodoro: 0,
-        sort: 0,
+        focus: 0,
+        short: 0,
         long: 0,
-        nc_pomodoro: 0,
-        nc_sort: 0,
+        nc_focus: 0,
+        nc_short: 0,
         nc_long: 0,
-        time_pomodoro: 0,
-        time_sort: 0,
+        time_focus: 0,
+        time_short: 0,
         time_long: 0,
-        time_nc_pomodoro: 0,
-        time_nc_sort: 0,
+        time_nc_focus: 0,
+        time_nc_short: 0,
         time_nc_long: 0,
       }
 
@@ -91,5 +64,5 @@ class HistoryDB extends Dexie {
   }
 }
 
-export type { ISession, IPerDayStatistics }
+export type { ISession, IDailyStat as IPerDayStatistics }
 export default HistoryDB

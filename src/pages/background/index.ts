@@ -52,13 +52,10 @@ class BackgroundService {
     }
 
     this.timer.onPause = sessionInfo => {
-      const sessionTypeForDB = this.mapSessionTypeForDB(sessionInfo.type)
-      if (!sessionTypeForDB) return
-
       this.historyDB.addSession({
         start_date: sessionInfo.startDate,
         end_date: sessionInfo.endDate,
-        type: sessionTypeForDB,
+        type: sessionInfo.type,
         has_valid_cycle: false,
       })
     }
@@ -87,29 +84,13 @@ class BackgroundService {
   }
 
   private saveCompletedSessionToHistory(sessionInfo: ICompletedSessionInfo): void {
-    const sessionTypeForDB = this.mapSessionTypeForDB(sessionInfo.type)
-    if (!sessionTypeForDB) return
-
     const isValidCycle = !sessionInfo.hasBeenResumed
     this.historyDB.addSession({
       start_date: sessionInfo.startDate,
       end_date: sessionInfo.endDate,
-      type: sessionTypeForDB,
+      type: sessionInfo.type,
       has_valid_cycle: isValidCycle,
     })
-  }
-
-  private mapSessionTypeForDB(type: SessionType): 'pomodoro' | 'sort' | 'long' | null {
-    switch (type) {
-      case SessionType.Focus:
-        return 'pomodoro'
-      case SessionType.Short:
-        return 'sort'
-      case SessionType.Long:
-        return 'long'
-      default:
-        return null
-    }
   }
 
   private setupListeners(): void {
