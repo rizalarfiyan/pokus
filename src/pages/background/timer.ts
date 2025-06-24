@@ -1,16 +1,5 @@
-import type { ISettings } from './settings'
-
-enum TimerState {
-  Running = 'running',
-  Paused = 'paused',
-  Stopped = 'stopped',
-}
-
-enum SessionType {
-  Pomodoro = 'pomodoro',
-  ShortBreak = 'shortBreak',
-  LongBreak = 'longBreak',
-}
+import { SessionType, TimerState } from '@/constants/pomodoro'
+import type { PomodoroSettings } from '@/types/pomodoro'
 
 interface ITimer {
   state: TimerState
@@ -29,7 +18,7 @@ interface ICompletedSessionInfo {
 
 class Timer {
   public state: ITimer
-  private settings: ISettings
+  private settings: PomodoroSettings
   private pomodorosCompleted: number = 0
   private intervalId: NodeJS.Timeout | null = null
 
@@ -39,9 +28,9 @@ class Timer {
   public onPause: ((sessionInfo: Omit<ICompletedSessionInfo, 'hasBeenResumed'>) => void) | null = null
   public onComplete: ((sessionInfo: ICompletedSessionInfo) => void) | null = null
 
-  constructor(settings: ISettings) {
+  constructor(settings: PomodoroSettings) {
     this.settings = settings
-    this.state = this.createInitialState(SessionType.Pomodoro)
+    this.state = this.createInitialState(SessionType.Focus)
   }
 
   private createInitialState(type: SessionType): ITimer {
@@ -127,7 +116,7 @@ class Timer {
     this.hasBeenResumed = false
     this.intervalId = null
     this.pomodorosCompleted = 0
-    this.state = this.createInitialState(SessionType.Pomodoro)
+    this.state = this.createInitialState(SessionType.Focus)
     this.notifyUpdate()
   }
 
@@ -151,19 +140,19 @@ class Timer {
 
     const completedType = this.state.type
 
-    if (completedType === SessionType.Pomodoro) {
+    if (completedType === SessionType.Focus) {
       this.pomodorosCompleted++
       const nextType =
-        this.pomodorosCompleted % this.settings.longBreakInterval === 0 ? SessionType.LongBreak : SessionType.ShortBreak
+        this.pomodorosCompleted % this.settings.longBreakInterval === 0 ? SessionType.Long : SessionType.Short
       this.state = this.createInitialState(nextType)
     } else {
-      this.state = this.createInitialState(SessionType.Pomodoro)
+      this.state = this.createInitialState(SessionType.Focus)
     }
 
     this.notifyUpdate()
   }
 
-  public updateSettings(newSettings: ISettings): void {
+  public updateSettings(newSettings: PomodoroSettings): void {
     this.settings = newSettings
     this.resetCycle()
   }
@@ -182,16 +171,14 @@ class Timer {
   }
 
   private getDurationForSession(sessionType: SessionType): number {
-    switch (sessionType) {
-      case SessionType.Pomodoro:
-        return this.settings.pomodoroDuration
-      case SessionType.ShortBreak:
-        return this.settings.shortBreakDuration
-      case SessionType.LongBreak:
-        return this.settings.longBreakDuration
-      default:
-        return this.settings.pomodoroDuration
+    const sessionDurations = {
+      [SessionType.Focus]: this.settings.focus,
+      [SessionType.Short]: this.settings.short,
+      [SessionType.Long]: this.settings.long,
     }
+
+    // TODO: don't forget to handle custom session durations
+    return (sessionDurations[sessionType] || this.settings.focus) * 1000
   }
 
   private notifyUpdate(): void {
@@ -201,6 +188,6 @@ class Timer {
   }
 }
 
-export { SessionType, TimerState }
+export { TimerState }
 export type { ICompletedSessionInfo, ITimer }
 export default Timer

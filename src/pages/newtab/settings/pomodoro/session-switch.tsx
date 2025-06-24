@@ -1,9 +1,9 @@
 import usePomodoroSetting from './store'
 import { Switch } from '@/components/ui/switch'
-import useDebounce from '@/hooks/use-debounce'
-import { useEffect, useState } from 'react'
+import useDebouncedToggle from '@/hooks/use-debounce-toggle'
+import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import type { NotificationShow, Session } from './types'
+import type { NotificationShow, Session } from '@/types/pomodoro'
 
 interface SessionSwitchProps {
   session: Session
@@ -18,13 +18,11 @@ const SessionSwitch = ({ session, show }: SessionSwitchProps) => {
     })),
   )
 
-  const [isActive, setIsActive] = useState(value)
-  const debounce = useDebounce(isActive, 500)
-
-  useEffect(() => {
-    if (value === isActive) return
+  const handleUpdate = useCallback(() => {
     toggleShowNotification(session, show)
-  }, [debounce, session, show, toggleShowNotification])
+  }, [session, show, toggleShowNotification])
+
+  const [isActive, setIsActive] = useDebouncedToggle(value, handleUpdate, 500)
 
   return <Switch checked={isActive} onCheckedChange={setIsActive} className="cursor-pointer" />
 }

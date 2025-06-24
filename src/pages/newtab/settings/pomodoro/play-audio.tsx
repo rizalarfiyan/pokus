@@ -4,8 +4,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Volume2 } from 'lucide-react'
 import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import type { Session } from './types'
 import type { ValueLabel } from '@/pages/newtab/types'
+import type { Session } from '@/types/pomodoro'
 
 const sounds: ValueLabel[] = [
   { value: '/sounds/notification-1.ogg', label: 'Notification 1' },

@@ -1,9 +1,9 @@
-import { presetList, timePreset } from './constant'
 import PresetCustom from './preset-custom'
 import StackedBar from './stack-bar'
 import usePomodoroSetting from './store'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { presetList, timePreset } from '@/constants/pomodoro'
 import { useShallow } from 'zustand/react/shallow'
 
 const Presets = () => {
@@ -17,7 +17,7 @@ const Presets = () => {
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-bold">Preset</h3>
-      <RadioGroup className="w-full gap-3" defaultValue={preset} onValueChange={changePreset}>
+      <RadioGroup className="w-full gap-3" defaultValue={preset} value={preset} onValueChange={changePreset}>
         {presetList.map(({ name, value, description }) => {
           const id = `pomodoro-${value}`
           const idDesc = `${id}-description`

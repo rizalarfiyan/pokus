@@ -1,6 +1,6 @@
 import PlayAudio from './play-audio'
 import { Label } from '@/components/ui/label'
-import type { Session } from './types'
+import type { Session } from '@/types/pomodoro'
 
 interface SessionAudioProps {
   session: Session

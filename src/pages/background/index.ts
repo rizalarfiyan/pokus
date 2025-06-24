@@ -5,8 +5,9 @@ import DesktopNotifier from './notifiers/desktop'
 import NewTabNotifier from './notifiers/new-tab'
 import SoundNotifier from './notifiers/sound'
 import Settings from './settings'
-import Timer, { TimerState, SessionType } from './timer'
-import type { ITimer, ICompletedSessionInfo } from './timer'
+import Timer from './timer'
+import { SessionType, TimerState } from '@/constants/pomodoro'
+import type { ICompletedSessionInfo, ITimer } from './timer'
 
 class BackgroundService {
   private settings: Settings
@@ -17,7 +18,8 @@ class BackgroundService {
   private historyDB: HistoryDB
   private badge: Badge
   private timer: Timer | null = null
-  private readonly ALARM_NAME = 'pomodoroTimerComplete'
+  private readonly TIMER_NOTIFICATION_ID = 'pomodoro-timer-notification'
+  private lastCompletedSessionType: SessionType | null = null
 
   constructor() {
     this.settings = new Settings()
@@ -62,42 +64,48 @@ class BackgroundService {
     }
 
     this.timer.onComplete = (sessionInfo: ICompletedSessionInfo) => {
-      const currentSettings = this.settings.get()
+      const currentSettings = this.settings.getPomodoro()
       const message = this.getCompletionMessage(sessionInfo.type)
 
-      if (currentSettings.showDesktopNotifications) {
-        this.desktopNotifier.show(this.ALARM_NAME, 'Pomodoro Timer', message, [{ title: 'Open Pokus' }])
+      const notificationSettings = currentSettings.notification[sessionInfo.type]
+      this.lastCompletedSessionType = sessionInfo.type
+
+      if (notificationSettings.desktop) {
+        this.desktopNotifier.show(this.TIMER_NOTIFICATION_ID, 'Pomodoro Timer', message, [{ title: 'Open Pokus' }])
       }
 
-      if (currentSettings.showNewTabNotifications) {
+      if (notificationSettings.newTab) {
         this.newTabNotifier.show()
       }
 
-      if (currentSettings.notificationSound) {
-        this.soundNotifier.play(currentSettings.notificationSound)
+      if (notificationSettings.audio) {
+        this.soundNotifier.play(notificationSettings.audio)
       }
 
-      const sessionTypeForDB = this.mapSessionTypeForDB(sessionInfo.type)
-      if (!sessionTypeForDB) return
-
-      const isValidCycle = !sessionInfo.hasBeenResumed
-
-      this.historyDB.addSession({
-        start_date: sessionInfo.startDate,
-        end_date: sessionInfo.endDate,
-        type: sessionTypeForDB,
-        has_valid_cycle: isValidCycle,
-      })
+      this.saveCompletedSessionToHistory(sessionInfo)
     }
+  }
+
+  private saveCompletedSessionToHistory(sessionInfo: ICompletedSessionInfo): void {
+    const sessionTypeForDB = this.mapSessionTypeForDB(sessionInfo.type)
+    if (!sessionTypeForDB) return
+
+    const isValidCycle = !sessionInfo.hasBeenResumed
+    this.historyDB.addSession({
+      start_date: sessionInfo.startDate,
+      end_date: sessionInfo.endDate,
+      type: sessionTypeForDB,
+      has_valid_cycle: isValidCycle,
+    })
   }
 
   private mapSessionTypeForDB(type: SessionType): 'pomodoro' | 'sort' | 'long' | null {
     switch (type) {
-      case SessionType.Pomodoro:
+      case SessionType.Focus:
         return 'pomodoro'
-      case SessionType.ShortBreak:
+      case SessionType.Short:
         return 'sort'
-      case SessionType.LongBreak:
+      case SessionType.Long:
         return 'long'
       default:
         return null
@@ -142,32 +150,36 @@ class BackgroundService {
     })
 
     chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
-      if (notificationId === this.ALARM_NAME && buttonIndex === 0) {
+      if (notificationId === this.TIMER_NOTIFICATION_ID && buttonIndex === 0) {
         this.newTabNotifier.show()
       }
     })
 
     chrome.notifications.onClosed.addListener((notificationId, byUser) => {
-      if (notificationId === this.ALARM_NAME && byUser) {
-        const currentSettings = this.settings.get()
-
-        if (currentSettings.showNewTabNotifications) {
+      if (notificationId === this.TIMER_NOTIFICATION_ID && byUser && this.lastCompletedSessionType) {
+        const currentSettings = this.settings.getPomodoro()
+        const notificationSettings = currentSettings.notification[this.lastCompletedSessionType]
+        if (notificationSettings.newTab) {
           this.newTabNotifier.show()
         }
+
+        this.lastCompletedSessionType = null
       }
     })
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
-      if (namespace === 'sync' && changes.settings) {
-        this.timer?.updateSettings(changes.settings.newValue)
+      if (namespace === 'sync' && changes.pomodoro) {
+        const newSettings = changes.pomodoro.newValue
+        this.settings.updatePomodoro(newSettings)
+        this.timer?.updateSettings(newSettings)
       }
     })
   }
 
   private updateAlarm(timerState: ITimer): void {
-    this.alarms.clear(this.ALARM_NAME)
+    this.alarms.clear(this.TIMER_NOTIFICATION_ID)
     if (timerState.state === TimerState.Running) {
-      this.alarms.create(this.ALARM_NAME, timerState.remainingTime / 60)
+      this.alarms.create(this.TIMER_NOTIFICATION_ID, timerState.remainingTime / 60)
     }
   }
 
@@ -187,8 +199,8 @@ class BackgroundService {
 
   private getCompletionMessage(completedType: SessionType): string {
     const nextSession = this.timer?.state.type
-    if (completedType === SessionType.Pomodoro) {
-      return `Pomodoro finished! Time for a ${nextSession === SessionType.LongBreak ? 'long' : 'short'} break.`
+    if (completedType === SessionType.Focus) {
+      return `Pomodoro finished! Time for a ${nextSession === SessionType.Long ? 'long' : 'short'} break.`
     }
 
     return 'Break is over! Time to get back to work.'

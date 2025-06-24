@@ -18,6 +18,7 @@ const PresetCustomSlider = memo(({ className, label, value, onChange }: PresetCu
     <Slider
       className="relative w-full cursor-pointer"
       defaultValue={[value]}
+      value={[value]}
       max={100}
       min={1}
       step={1}

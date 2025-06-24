@@ -3,8 +3,8 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import type { LongBreakInterval } from './types'
 import type { ValueLabel } from '@/pages/newtab/types'
+import type { LongBreakInterval } from '@/types/pomodoro'
 
 const longBreaks: ValueLabel<LongBreakInterval>[] = [
   { value: 0, label: 'Never' },

@@ -4,7 +4,7 @@ import usePomodoroSetting from './store'
 import useDebounce from '@/hooks/use-debounce'
 import { useCallback, useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
-import type { TimePreset } from './types'
+import type { TimePreset } from '@/types/pomodoro'
 
 const PresetCustom = () => {
   const { changeCustomPreset, custom } = usePomodoroSetting(
@@ -19,6 +19,17 @@ const PresetCustom = () => {
     short: custom.short,
     long: custom.long,
   })
+
+  useEffect(() => {
+    // todo: change with deep equal
+    if (values.focus !== custom.focus || values.short !== custom.short || values.long !== custom.long) {
+      setValues({
+        focus: custom.focus,
+        short: custom.short,
+        long: custom.long,
+      })
+    }
+  }, [custom])
 
   const debounce = useDebounce(values, 750)
   useEffect(() => {

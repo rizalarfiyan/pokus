@@ -1,6 +1,6 @@
 import SessionSwitch from './session-switch'
 import { Label } from '@/components/ui/label'
-import type { NotificationShow, Session } from './types'
+import type { NotificationShow, Session } from '@/types/pomodoro'
 
 interface SessionShowProps {
   session: Session

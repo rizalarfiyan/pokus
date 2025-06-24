@@ -1,10 +1,10 @@
-import { notification, timePreset } from './constant'
+import { notification, timePreset } from '@/constants/pomodoro'
+import chromeStorage from '@/storage/zustand'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import type { StateAction } from './types'
 
 const usePomodoroSetting = create<StateAction>()(
-  persist(
+  chromeStorage(
     set => ({
       ...timePreset['classic'],
       preset: 'classic',
@@ -52,7 +52,8 @@ const usePomodoroSetting = create<StateAction>()(
         })),
     }),
     {
-      name: 'pomodoro-setting',
+      name: 'pomodoro',
+      storageType: 'sync',
     },
   ),
 )

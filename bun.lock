@@ -6,6 +6,7 @@
       "dependencies": {
         "@dnd-kit/core": "^6.3.1",
         "@dnd-kit/sortable": "^10.0.0",
+        "@fastify/deepmerge": "^3.1.0",
         "@hello-pangea/dnd": "^18.0.1",
         "@hookform/resolvers": "^5.1.1",
         "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -24,6 +25,7 @@
         "clsx": "^2.1.1",
         "dayjs": "^1.11.13",
         "dexie": "^4.0.11",
+        "fast-deep-equal": "^3.1.3",
         "lucide-react": "^0.517.0",
         "nanoid": "^5.1.5",
         "react": "^19.1.0",
@@ -187,6 +189,8 @@
     "@eslint/object-schema": ["@eslint/object-schema@2.1.6", "", {}, "sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA=="],
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.3.2", "", { "dependencies": { "@eslint/core": "^0.15.0", "levn": "^0.4.1" } }, "sha512-4SaFZCNfJqvk/kenHpI8xvN42DMaoycy4PzKc5otHxRswww1kAt82OlBuwRVLofCACCTZEcla2Ydxv8scMXaTg=="],
+
+    "@fastify/deepmerge": ["@fastify/deepmerge@3.1.0", "", {}, "sha512-lCVONBQINyNhM6LLezB6+2afusgEYR4G8xenMsfe+AT+iZ7Ca6upM5Ha8UkZuYSnuMw3GWl/BiPXnLMi/gSxuQ=="],
 
     "@floating-ui/core": ["@floating-ui/core@1.7.1", "", { "dependencies": { "@floating-ui/utils": "^0.2.9" } }, "sha512-azI0DrjMMfIug/ExbBaeDVJXcY0a7EPvPjb2xAJPa4HeimBX+Z18HK8QQR3jb6356SnDDdxx+hinMLcJEDdOjw=="],
 

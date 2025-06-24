@@ -1,4 +1,16 @@
-import type { TimePreset, Preset, PresetItem, Notification } from './types'
+import type { TimePreset, Preset, PresetItem, Notification } from '@/types/pomodoro'
+
+enum SessionType {
+  Focus = 'focus',
+  Short = 'short',
+  Long = 'long',
+}
+
+enum TimerState {
+  Running = 'running',
+  Paused = 'paused',
+  Stopped = 'stopped',
+}
 
 const timePreset: Record<Exclude<Preset, 'custom'>, TimePreset> = {
   'sort-burst': {
@@ -69,4 +81,4 @@ const notification: Notification = {
   },
 }
 
-export { timePreset, presetList, notification }
+export { SessionType, TimerState, timePreset, presetList, notification }

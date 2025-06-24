@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import type { TimePreset } from './types'
+import type { TimePreset } from '@/types/pomodoro'
 
 interface StackedBarProps {
   value: TimePreset

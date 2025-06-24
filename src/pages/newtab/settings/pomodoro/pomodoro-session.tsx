@@ -1,7 +1,7 @@
 import LongBreakInterval from './long-break-interval'
 import SessionAudio from './session-audio'
 import SessionShow from './session-show'
-import type { Session } from './types'
+import type { Session } from '@/types/pomodoro'
 import type React from 'react'
 
 type SessionType = {

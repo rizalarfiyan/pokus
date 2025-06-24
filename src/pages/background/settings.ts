@@ -1,54 +1,49 @@
-interface ISettings {
-  pomodoroDuration: number
-  shortBreakDuration: number
-  longBreakDuration: number
-  longBreakInterval: number
+import { notification, timePreset } from '@/constants/pomodoro'
+import createDeepMerge from '@fastify/deepmerge'
+import type { PomodoroSettings } from '@/types/pomodoro'
 
-  showDesktopNotifications: boolean
-  showNewTabNotifications: boolean
-  notificationSound: string | null
-}
-
-const DEFAULT_SETTINGS: ISettings = {
-  pomodoroDuration: 1 * 5 * 1000, // 5 seconds
-  shortBreakDuration: 2 * 5 * 1000, // 10 seconds
-  longBreakDuration: 3 * 5 * 1000, // 15 seconds
+const DEFAULT_POMODORO: PomodoroSettings = {
+  ...timePreset['classic'],
+  preset: 'classic',
+  custom: timePreset['classic'],
   longBreakInterval: 4,
-
-  showDesktopNotifications: true,
-  showNewTabNotifications: true,
-  notificationSound: '/sounds/notification-1.ogg',
+  notification,
 }
 
 class Settings {
-  private current: ISettings = { ...DEFAULT_SETTINGS }
+  private pomodoro: PomodoroSettings = { ...DEFAULT_POMODORO }
 
-  public async load(): Promise<ISettings> {
+  public async load(): Promise<PomodoroSettings> {
+    const deepMerge = createDeepMerge()
+
     return new Promise(resolve => {
-      chrome.storage.sync.get('settings', data => {
-        if (data.settings) {
-          this.current = { ...DEFAULT_SETTINGS, ...data.settings }
+      chrome.storage.sync.get('pomodoro', data => {
+        if (data.pomodoro) {
+          this.pomodoro = deepMerge(DEFAULT_POMODORO, data.pomodoro)
         } else {
-          this.save(this.current)
+          this.save(this.pomodoro)
         }
-        resolve(this.current)
+        resolve(this.pomodoro)
       })
     })
   }
 
-  public async save(newSettings: ISettings): Promise<void> {
-    this.current = newSettings
+  public async save(newSettings: PomodoroSettings): Promise<void> {
+    this.pomodoro = newSettings
     return new Promise(resolve => {
-      chrome.storage.sync.set({ settings: newSettings }, () => {
+      chrome.storage.sync.set({ pomodoro: newSettings }, () => {
         resolve()
       })
     })
   }
 
-  public get(): ISettings {
-    return this.current
+  public getPomodoro(): PomodoroSettings {
+    return this.pomodoro
+  }
+
+  public updatePomodoro(newSettings: PomodoroSettings): void {
+    this.pomodoro = newSettings
   }
 }
 
-export type { ISettings }
 export default Settings
