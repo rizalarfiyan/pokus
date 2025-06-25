@@ -1,18 +1,14 @@
 import dayjs, { unix } from 'dayjs'
 import { useMemo } from 'react'
 import { ActivityCalendar } from 'react-activity-calendar'
+import type StatisticItem from './types'
 import type React from 'react'
 import type { Activity } from 'react-activity-calendar'
-
-interface StatisticItem {
-  date: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
 
 interface StatisticHeatmapProps {
   histories: StatisticItem[]
   year?: number
+  isLoading?: boolean
   getValue: (item: StatisticItem) => number
   totalCountLabel?: (total: number) => string
 }
@@ -22,6 +18,7 @@ const DATE_FORMAT = 'YYYY-MM-DD'
 const StatisticHeatmap: React.FC<StatisticHeatmapProps> = ({
   histories,
   year = new Date().getFullYear(),
+  isLoading,
   getValue,
   totalCountLabel = () => '{{count}} history in {{year}}',
 }) => {
@@ -84,6 +81,7 @@ const StatisticHeatmap: React.FC<StatisticHeatmapProps> = ({
       showWeekdayLabels
       blockSize={14}
       blockMargin={4}
+      loading={isLoading}
       labels={{
         totalCount: totalCountLabel(data.total),
       }}
