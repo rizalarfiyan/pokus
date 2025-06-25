@@ -1,3 +1,4 @@
+import { arrayOrderUnique } from '@/lib/utils'
 import chromeStorage from '@/storage/zustand'
 import { nanoid } from 'nanoid'
 import { create } from 'zustand'
@@ -131,6 +132,14 @@ const useBlocking = create<StateAction>()(
     {
       name: 'blocking',
       storageType: 'sync',
+      mergeCallback(value) {
+        // TODO: fix the logic make be better
+        for (const key of Object.keys(value.groups)) {
+          value.groups[key].websiteIds = arrayOrderUnique(value.groups[key].websiteIds)
+        }
+        value.groupOrder = arrayOrderUnique(value.groupOrder)
+        return value
+      },
     },
   ),
 )
