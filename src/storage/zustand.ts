@@ -1,13 +1,17 @@
 import createDeepMerge from '@fastify/deepmerge'
 import type { StateCreator, StoreApi } from 'zustand'
 
-type ChromeStorageOptions = {
+type ChromeStorageOptions<T extends object> = {
   name: string
   storageType?: 'local' | 'sync' | 'managed' | 'session'
+  mergeCallback?: (value: T) => T
 }
 
-const chromeStorage = <T extends object>(config: StateCreator<T>, options: ChromeStorageOptions): StateCreator<T> => {
-  const { name, storageType = 'local' } = options
+const chromeStorage = <T extends object>(
+  config: StateCreator<T>,
+  options: ChromeStorageOptions<T>,
+): StateCreator<T> => {
+  const { name, storageType = 'local', mergeCallback = val => val } = options
   const storage = chrome.storage[storageType]
 
   const deepMerge = createDeepMerge()
@@ -45,7 +49,7 @@ const chromeStorage = <T extends object>(config: StateCreator<T>, options: Chrom
 
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
       if (changes[name]) {
-        const newState = changes[name].newValue
+        const newState = changes[name].newValue as T
         if (!newState) return
 
         if (isUpdateFromLocal) {
@@ -53,7 +57,7 @@ const chromeStorage = <T extends object>(config: StateCreator<T>, options: Chrom
           return
         }
 
-        const mergedState = deepMerge(get(), newState)
+        const mergedState = mergeCallback(deepMerge(get(), newState) as T)
         set(mergedState as Partial<T>)
       }
     }
@@ -70,7 +74,7 @@ const chromeStorage = <T extends object>(config: StateCreator<T>, options: Chrom
     getItem()
       .then(storedState => {
         if (storedState) {
-          const mergedState = deepMerge(get(), storedState)
+          const mergedState = mergeCallback(deepMerge(get(), storedState) as T)
           set(mergedState as Partial<T>)
         }
       })

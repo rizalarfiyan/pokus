@@ -1,19 +1,5 @@
+import type { BlockingSettings, Id, WebsiteType, GroupType, BlockingTheme } from '@/types/blocking'
 import type { DropResult } from '@hello-pangea/dnd'
-
-type Id = string
-
-interface WebsiteType {
-  id: Id
-  name: string
-  domain: string
-  isActive?: boolean
-}
-
-interface GroupType {
-  id: Id
-  name: string
-  websiteIds: Id[]
-}
 
 interface DeleteActionWebsite {
   id: Id
@@ -57,12 +43,6 @@ interface ModalWebsiteEdit {
 
 type ModalWebsite = ModalWebsiteCreate | ModalWebsiteEdit
 
-interface State {
-  websites: Record<Id, WebsiteType>
-  groups: Record<Id, GroupType>
-  groupOrder: Id[]
-}
-
 type Actions = {
   addWebsite: (groupId: Id, name: string, domain: string) => void
   updateWebsite: (websiteId: Id, groupId: Id, name: string, domain: string) => void
@@ -72,9 +52,12 @@ type Actions = {
   deleteGroup: (groupId: Id) => void
   toggleWebsiteActive: (websiteId: Id) => void
   handleDragEnd: (result: DropResult) => void
+  changeTheme: (theme: BlockingTheme) => void
 }
 
-type StateAction = State & Actions
+type State = BlockingSettings
+
+type StateAction = BlockingSettings & Actions
 
 interface ModalState {
   delete: DeleteAction | null

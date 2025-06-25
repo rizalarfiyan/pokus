@@ -1,130 +1,16 @@
+import { arrayOrderUnique } from '@/lib/utils'
+import chromeStorage from '@/storage/zustand'
 import { nanoid } from 'nanoid'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { GroupType, ModalStateAction, State, StateAction, WebsiteType } from './types'
-
-const initialData: State = {
-  websites: {
-    '1': {
-      id: '1',
-      name: 'Facebook',
-      domain: 'facebook.com',
-      isActive: true,
-    },
-    '2': {
-      id: '2',
-      name: 'Instagram',
-      domain: 'instagram.com',
-      isActive: true,
-    },
-    '3': {
-      id: '3',
-      name: 'X (Twitter)',
-      domain: 'x.com',
-      isActive: true,
-    },
-    '4': {
-      id: '4',
-      name: 'TikTok',
-      domain: 'tiktok.com',
-      isActive: true,
-    },
-    '5': {
-      id: '5',
-      name: 'LinkedIn',
-      domain: 'linkedin.com',
-      isActive: false,
-    },
-    '6': {
-      id: '6',
-      name: 'YouTube',
-      domain: 'youtube.com',
-      isActive: true,
-    },
-    '7': {
-      id: '7',
-      name: 'Netflix',
-      domain: 'netflix.com',
-      isActive: true,
-    },
-    '8': {
-      id: '8',
-      name: 'Steam Store',
-      domain: 'store.steampowered.com',
-      isActive: true,
-    },
-    '9': {
-      id: '9',
-      name: 'Disney+ Hotstar',
-      domain: 'hotstar.com',
-      isActive: false,
-    },
-    '10': {
-      id: '10',
-      name: 'Detik.com',
-      domain: 'detik.com',
-      isActive: true,
-    },
-    '11': {
-      id: '11',
-      name: 'Kompas.com',
-      domain: 'kompas.com',
-      isActive: true,
-    },
-    '12': {
-      id: '12',
-      name: 'CNN Indonesia',
-      domain: 'cnnindonesia.com',
-      isActive: true,
-    },
-    '13': {
-      id: '13',
-      name: 'Tokopedia',
-      domain: 'tokopedia.com',
-      isActive: true,
-    },
-    '14': {
-      id: '14',
-      name: 'Shopee',
-      domain: 'shopee.co.id',
-      isActive: true,
-    },
-    '15': {
-      id: '15',
-      name: 'Lazada',
-      domain: 'lazada.co.id',
-      isActive: true,
-    },
-  },
-  groups: {
-    'social-media': {
-      id: 'social-media',
-      name: 'Social Media',
-      websiteIds: ['1', '2', '3', '4', '5'],
-    },
-    'streaming-gaming': {
-      id: 'streaming-gaming',
-      name: 'Streaming & Gaming',
-      websiteIds: ['6', '7', '8', '9'],
-    },
-    news: {
-      id: 'news',
-      name: 'News',
-      websiteIds: ['10', '11', '12'],
-    },
-    shopping: {
-      id: 'shopping',
-      name: 'Shopping',
-      websiteIds: ['13', '14', '15'],
-    },
-  },
-  groupOrder: ['social-media', 'streaming-gaming', 'news', 'shopping'],
-}
+import type { GroupType, ModalStateAction, StateAction, WebsiteType } from './types'
 
 const useBlocking = create<StateAction>()(
-  persist(
+  chromeStorage(
     set => ({
-      ...initialData,
+      theme: 'default',
+      websites: {},
+      groupOrder: [],
+      groups: {},
       addWebsite: (groupId, name, domain) => {
         const newWebsiteId = nanoid()
         const newWebsite: WebsiteType = { id: newWebsiteId, name, domain, isActive: true }
@@ -241,9 +127,19 @@ const useBlocking = create<StateAction>()(
           }
         })
       },
+      changeTheme: theme => set({ theme }),
     }),
     {
       name: 'blocking',
+      storageType: 'sync',
+      mergeCallback(value) {
+        // TODO: fix the logic make be better
+        for (const key of Object.keys(value.groups)) {
+          value.groups[key].websiteIds = arrayOrderUnique(value.groups[key].websiteIds)
+        }
+        value.groupOrder = arrayOrderUnique(value.groupOrder)
+        return value
+      },
     },
   ),
 )
