@@ -1,6 +1,7 @@
 import Ambience from './ambience'
 import Blocking from './blocking'
 import Pomodoro from './pomodoro'
+import Statistics from './statistics'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartLine, GlobeLock, ListMusic, Timer, Trophy } from 'lucide-react'
 import { useState } from 'react'
@@ -27,7 +28,7 @@ const tabsContents = [
   {
     value: 'statistic',
     label: 'Statistic',
-    content: 'Page Statistic!',
+    content: <Statistics />,
     icon: ChartLine,
   },
   {

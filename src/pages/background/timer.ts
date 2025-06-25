@@ -178,7 +178,7 @@ class Timer {
     }
 
     // TODO: don't forget to handle custom session durations
-    return (sessionDurations[sessionType] || this.settings.focus) * 1000
+    return (sessionDurations[sessionType] || this.settings.focus) * 60 * 1000
   }
 
   private notifyUpdate(): void {
