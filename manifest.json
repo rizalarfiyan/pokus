@@ -8,14 +8,18 @@
     },
     "chrome_url_overrides": {
         "newtab": "src/pages/newtab/index.html",
-        "offscreen": "src/pages/offscreen/index.html"
+        "offscreen": "src/pages/offscreen/index.html",
+        "blocking": "src/pages/blocking/index.html"
     },
-    "permissions": ["storage", "alarms", "notifications", "offscreen"],
-    "content_scripts": [
-        {
-            "matches": ["http://*/*", "https://*/*", "<all_urls>"],
-            "js": ["src/pages/content/index.tsx"]
-        }
+    "permissions": [
+        "storage",
+        "alarms",
+        "notifications",
+        "offscreen",
+        "declarativeNetRequest",
+        "declarativeNetRequestWithHostAccess",
+        "tabs",
+        "webNavigation"
     ],
     "action": {
         "default_icon": "icon-32.png"
@@ -26,10 +30,15 @@
         "32": "icon-32.png",
         "16": "icon-16.png"
     },
+    "host_permissions": ["<all_urls>"],
     "web_accessible_resources": [
         {
             "resources": ["icon-128.png", "icon-48.png", "icon-32.png", "icon-16.png"],
             "matches": []
+        },
+        {
+            "resources": ["src/pages/blocking/index.html"],
+            "matches": ["<all_urls>"]
         }
     ]
 }

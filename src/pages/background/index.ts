@@ -1,5 +1,6 @@
 import Alarms from './alarms'
 import Badge from './badge'
+import { Blocker } from './blocker'
 import HistoryDB from './db/history'
 import DesktopNotifier from './notifiers/desktop'
 import NewTabNotifier from './notifiers/new-tab'
@@ -8,6 +9,15 @@ import Settings from './settings'
 import Timer from './timer'
 import { SessionType, TimerState } from '@/constants/pomodoro'
 import type { ICompletedSessionInfo, ITimer } from './timer'
+
+const TEMP_WHITELIST_KEY = 'tempWhitelist'
+const BLOCKED_URL_MAP_KEY = 'blockedUrlMap'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type IChromeRequest = any
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type IChromeSendResponse = (response?: any) => void
 
 class BackgroundService {
   private settings: Settings
@@ -21,6 +31,9 @@ class BackgroundService {
   private readonly TIMER_NOTIFICATION_ID = 'pomodoro-timer-notification'
   private lastCompletedSessionType: SessionType | null = null
 
+  private blocker: Blocker
+  private isBlockingActive: boolean = false
+
   constructor() {
     this.settings = new Settings()
     this.alarms = new Alarms()
@@ -29,6 +42,8 @@ class BackgroundService {
     this.newTabNotifier = new NewTabNotifier()
     this.historyDB = new HistoryDB()
     this.badge = new Badge()
+    this.blocker = new Blocker()
+    this.isBlockingActive = false
 
     this.initialize()
   }
@@ -36,6 +51,8 @@ class BackgroundService {
   private async initialize(): Promise<void> {
     const initialSettings = await this.settings.load()
     this.timer = new Timer(initialSettings)
+
+    await this.blocker.disable()
 
     this.setupTimerHooks()
     this.setupListeners()
@@ -45,10 +62,11 @@ class BackgroundService {
     if (!this.timer) return
 
     // update every second
-    this.timer.onUpdate = (timerState: ITimer) => {
+    this.timer.onUpdate = async (timerState: ITimer) => {
       this.updateBadge(timerState)
       this.updateAlarm(timerState)
       this.sendMessageToUI('timerUpdate', timerState)
+      this.triggerBlocking(timerState)
     }
 
     this.timer.onPause = sessionInfo => {
@@ -94,8 +112,27 @@ class BackgroundService {
   }
 
   private setupListeners(): void {
+    chrome.webNavigation.onBeforeNavigate.addListener(details => {
+      if (details.frameId !== 0) return
+      const url = new URL(details.url)
+      const domain = url.hostname.replace(/^www\./, '')
+      // TODO: add indexdb analytics user activity
+
+      this.handleBlocking(domain, details)
+    })
+
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (!this.timer) return true
+
+      if (request.action === 'getOriginalUrl') {
+        this.getOriginalUrl(sender, sendResponse)
+        return true
+      }
+
+      if (request.action === 'addTempWhitelist') {
+        this.addTempWhitelist(request, sendResponse)
+        return true
+      }
 
       // TODO: update the request action later
       if (request.action === 'setSettings' && this.timer.state.state === TimerState.Running) {
@@ -148,13 +185,90 @@ class BackgroundService {
       }
     })
 
-    chrome.storage.onChanged.addListener((changes, namespace) => {
-      if (namespace === 'sync' && changes.pomodoro) {
+    chrome.storage.sync.onChanged.addListener(changes => {
+      if (changes.pomodoro) {
         const newSettings = changes.pomodoro.newValue
         this.settings.updatePomodoro(newSettings)
         this.timer?.updateSettings(newSettings)
       }
+
+      if (changes.blocking) {
+        // TODO: update blocking settings
+        // const newSettings = changes.pomodoro.newValue
+        // this.settings.updatePomodoro(newSettings)
+        // this.timer?.updateSettings(newSettings)
+      }
     })
+  }
+
+  private async getOriginalUrl(sender: chrome.runtime.MessageSender, sendResponse: IChromeSendResponse): Promise<void> {
+    if (sender.tab?.id) {
+      const data = await chrome.storage.session.get(BLOCKED_URL_MAP_KEY)
+      const map = data[BLOCKED_URL_MAP_KEY] || {}
+      const originalUrl = map[sender.tab.id]
+      delete map[sender.tab.id]
+      await chrome.storage.session.set({ [BLOCKED_URL_MAP_KEY]: map })
+      sendResponse({ url: originalUrl })
+      return
+    }
+
+    sendResponse({ url: null })
+  }
+
+  private async handleBlocking(domain: string, details: chrome.webNavigation.WebNavigationFramedCallbackDetails) {
+    if (!this.isBlockingActive) return
+
+    // TODO: implement cache to best performance
+    const currentSettings = this.settings.getBlocking()
+    const sitesToBlock = Object.values(currentSettings.websites)
+      .filter(w => w.isActive)
+      .map(w => w.domain.replace(/^(https?:\/\/)?(www\.)?/, ''))
+
+    if (sitesToBlock.includes(domain)) {
+      const data = await chrome.storage.session.get(BLOCKED_URL_MAP_KEY)
+      const map = data[BLOCKED_URL_MAP_KEY] || {}
+      map[details.tabId] = details.url
+      await chrome.storage.session.set({ [BLOCKED_URL_MAP_KEY]: map })
+    }
+  }
+
+  private async addTempWhitelist(request: IChromeRequest, sendResponse: IChromeSendResponse): Promise<void> {
+    const domain = request.domain
+    if (!domain) return
+
+    const data = await chrome.storage.session.get(TEMP_WHITELIST_KEY)
+    const currentWhitelist = data[TEMP_WHITELIST_KEY] || []
+
+    if (!currentWhitelist.includes(domain)) {
+      currentWhitelist.push(domain)
+    }
+
+    await chrome.storage.session.set({ [TEMP_WHITELIST_KEY]: currentWhitelist })
+    if (this.isBlockingActive) {
+      const currentSettings = this.settings.getBlocking()
+      await this.blocker.enable(currentSettings, currentWhitelist)
+    }
+
+    sendResponse({ success: true })
+  }
+
+  private async triggerBlocking(timerState: ITimer): Promise<void> {
+    const shouldBeBlocking = timerState.state === TimerState.Running && timerState.type === SessionType.Focus
+    if (shouldBeBlocking && !this.isBlockingActive) {
+      const currentSettings = this.settings.getBlocking()
+      const whitelist = (await chrome.storage.session.get(TEMP_WHITELIST_KEY))[TEMP_WHITELIST_KEY] || []
+      await this.blocker.enable(currentSettings, whitelist)
+      this.isBlockingActive = true
+      return
+    }
+
+    if (!shouldBeBlocking && this.isBlockingActive) {
+      await this.blocker.disable()
+      await chrome.storage.session.remove(TEMP_WHITELIST_KEY)
+      await chrome.storage.session.remove(BLOCKED_URL_MAP_KEY)
+      this.isBlockingActive = false
+      return
+    }
   }
 
   private updateAlarm(timerState: ITimer): void {
