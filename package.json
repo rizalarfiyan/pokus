@@ -51,8 +51,6 @@
         "typescript": "^5.0.0"
     },
     "dependencies": {
-        "@dnd-kit/core": "^6.3.1",
-        "@dnd-kit/sortable": "^10.0.0",
         "@fastify/deepmerge": "^3.1.0",
         "@hello-pangea/dnd": "^18.0.1",
         "@hookform/resolvers": "^5.1.1",
