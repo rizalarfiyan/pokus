@@ -1,10 +1,11 @@
+import Blocking from './blocking'
 import Pomodoro from './pomodoro'
 import Logo from '@/components/logo'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Settings2, SettingsIcon, Timer } from 'lucide-react'
+import { GlobeLock, Settings2, SettingsIcon, Timer } from 'lucide-react'
 
 const tabsContents = [
   {
@@ -12,6 +13,12 @@ const tabsContents = [
     label: 'General',
     content: <div className="px-4">General settings for the new tab experience.</div>,
     icon: Settings2,
+  },
+  {
+    value: 'blocking',
+    label: 'Blocking',
+    content: <Blocking />,
+    icon: GlobeLock,
   },
   {
     value: 'pomodoro',

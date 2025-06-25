@@ -1,4 +1,4 @@
-import type { BlockingSettings, Id, WebsiteType, GroupType } from '@/types/blocking'
+import type { BlockingSettings, Id, WebsiteType, GroupType, BlockingTheme } from '@/types/blocking'
 import type { DropResult } from '@hello-pangea/dnd'
 
 interface DeleteActionWebsite {
@@ -52,6 +52,7 @@ type Actions = {
   deleteGroup: (groupId: Id) => void
   toggleWebsiteActive: (websiteId: Id) => void
   handleDragEnd: (result: DropResult) => void
+  changeTheme: (theme: BlockingTheme) => void
 }
 
 type State = BlockingSettings

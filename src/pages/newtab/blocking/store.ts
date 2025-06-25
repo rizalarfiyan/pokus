@@ -6,6 +6,7 @@ import type { GroupType, ModalStateAction, StateAction, WebsiteType } from './ty
 const useBlocking = create<StateAction>()(
   chromeStorage(
     set => ({
+      theme: 'default',
       websites: {},
       groupOrder: [],
       groups: {},
@@ -125,6 +126,7 @@ const useBlocking = create<StateAction>()(
           }
         })
       },
+      changeTheme: theme => set({ theme }),
     }),
     {
       name: 'blocking',

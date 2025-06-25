@@ -3,6 +3,7 @@ import './style.css'
 
 const root = document.getElementById('__root')!
 
+let prevUrl = ''
 const updateState = () => {
   const excludeBtn = document.getElementById('excludeBtn') as HTMLButtonElement
   const siteUrlElement = document.getElementById('blockedSiteUrl') as HTMLElement
@@ -10,13 +11,14 @@ const updateState = () => {
   excludeBtn.disabled = true
 
   chrome.runtime.sendMessage({ action: 'getOriginalUrl' }, response => {
-    if (!response || !response.url) {
+    if ((!response || !response.url) && prevUrl === '') {
       console.error('Could not get the original URL from the background script.')
       siteUrlElement.textContent = 'Unknown page'
       return
     }
 
-    const blockedUrl = response.url
+    const blockedUrl = response?.url || prevUrl
+    prevUrl = blockedUrl
     const url = new URL(blockedUrl)
     const domain = url.hostname.replace(/^www\./, '')
 
