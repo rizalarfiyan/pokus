@@ -1,3 +1,4 @@
+import Audio from './audio'
 import Icon from './icon'
 import useAmbience from './store'
 import Variant from './variant'
@@ -43,6 +44,7 @@ const Item = ({ ambience }: ItemProps) => {
           'mx-auto flex max-h-0 w-full flex-col items-center gap-4 overflow-hidden transition-all duration-300',
           active && 'max-h-screen',
         )}>
+        <Audio active={active} />
         <Volume ambience={ambience} active={active} />
         <Variant ambience={ambience} active={active} />
       </div>

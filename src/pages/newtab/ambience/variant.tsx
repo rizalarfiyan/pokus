@@ -29,6 +29,7 @@ const Variant = ({ ambience, active }: VariantProps) => {
         return (
           <label
             htmlFor={id}
+            key={variant}
             className="border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring/50 bg-background text-primary relative cursor-pointer rounded-md border-2 px-1.5 py-0.5 text-xs font-bold backdrop-blur-sm outline-none has-focus-visible:ring-[3px]">
             <RadioGroupItem value={variant} id={id} className="sr-only" />
             {variant}

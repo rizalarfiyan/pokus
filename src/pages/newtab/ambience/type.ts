@@ -9,7 +9,6 @@ type BirdVariant = 'blackbird' | 'nightingale' | 'crow'
 type ForestVariant = 'evening' | 'eerie'
 type WindVariant = 'steady' | 'howling'
 type LeavesVariant = 'soft' | 'crunch'
-type FootstepsVariant = 'gravel' | 'snow' | 'pavement'
 type TrainVariant = 'slow' | 'fast'
 type RestaurantVariant = 'english' | 'french' | 'german' | 'pub'
 type NoiseVariant = 'white' | 'pink' | 'brown'
@@ -70,11 +69,6 @@ type Leaves = {
   variant: LeavesVariant
 }
 
-type Footsteps = {
-  type: 'footsteps'
-  variant: FootstepsVariant
-}
-
 type Train = {
   type: 'train'
   variant: TrainVariant
@@ -107,7 +101,6 @@ type Ambience =
   | Forest
   | Wind
   | Leaves
-  | Footsteps
   | Train
   | Restaurant
   | Noise
@@ -168,11 +161,6 @@ type ListLeaves = {
   variant: LeavesVariant[]
 }
 
-type ListFootsteps = {
-  type: 'footsteps'
-  variant: FootstepsVariant[]
-}
-
 type ListTrain = {
   type: 'train'
   variant: TrainVariant[]
@@ -206,7 +194,6 @@ type ListAmbience =
   | ListForest
   | ListWind
   | ListLeaves
-  | ListFootsteps
   | ListTrain
   | ListRestaurant
   | ListNoise

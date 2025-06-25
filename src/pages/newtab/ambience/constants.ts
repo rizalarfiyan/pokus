@@ -46,10 +46,6 @@ const ambience: ListAmbience[] = [
     variant: ['soft', 'crunch'],
   },
   {
-    type: 'footsteps',
-    variant: ['gravel', 'snow', 'pavement'],
-  },
-  {
     type: 'train',
     variant: ['slow', 'fast'],
   },
